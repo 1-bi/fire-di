@@ -2,7 +2,8 @@ package test
 
 import (
 	"fmt"
-	"gitlab.com/1-bi/fire-di/test/modules"
+	di "github.com/1-bi/fire-di"
+	"github.com/1-bi/fire-di/test/modules"
 	"testing"
 )
 

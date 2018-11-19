@@ -2,7 +2,7 @@ package modules
 
 import (
 	"fmt"
-	"github.com/1-bi/fire-di/di"
+	di "github.com/1-bi/fire-di"
 )
 
 type TestCaeeModule struct {
