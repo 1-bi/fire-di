@@ -1,0 +1,9 @@
+bin/
+pkg/
+.idea/
+vendor
+/.idea/vcs.xml
+.settings/
+go.sum
+fire-di.iml
+.project
