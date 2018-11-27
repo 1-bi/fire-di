@@ -100,11 +100,11 @@ func RegisterModules(mods ...Module) providerstore {
 /**
  * create injecto for object
  */
-func CreateInjector(bs providerstore) *injector {
+func CreateInjector(bs providerstore) (*injector, error) {
 
-	injector := createInjector(bs)
+	injector, err := createInjector(bs)
 
-	return injector
+	return injector, err
 }
 
 /**

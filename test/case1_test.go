@@ -1,9 +1,10 @@
 package test
 
 import (
-	"fmt"
 	di "github.com/1-bi/fire-di"
+	"github.com/1-bi/fire-di/test/mockobject"
 	"github.com/1-bi/fire-di/test/modules"
+	"log"
 	"testing"
 )
 
@@ -13,12 +14,19 @@ import (
 func TestDI_module_case01(t *testing.T) {
 
 	// ----- register module pre defined ----
-	bs := di.RegisterModules(&modules.TestCaeeModule{})
+	bs := di.RegisterModules(&modules.Case1Module{})
 
 	// ----- create injector for modules
-	injector := di.CreateInjector(bs)
+	injector, err := di.CreateInjector(bs)
 
 	// ----- create injector ----
-	fmt.Println(injector)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		injector.Execute(bootstrapCase1)
+	}
+}
 
+func bootstrapCase1(helper *mockobject.Case1Helper) {
+	helper.SayHello()
 }

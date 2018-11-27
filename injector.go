@@ -11,30 +11,43 @@ type injector struct {
 }
 
 // ---- call and create injector ---
-func createInjector(bs providerstore) *injector {
+func createInjector(bs providerstore) (*injector, error) {
+	var err error
 	// ---- create injector ----
 	injector := &injector{dig.New(), bs.modContext.Provider.invokedFuns}
 
 	// ---- create application ctx bean first -----
-	injector.container.Provide(createBeanCtxBinderAndApplicationCtx)
+	err = injector.container.Provide(createBeanCtxBinderAndApplicationCtx)
+	if err != nil {
+		return injector, err
+	}
 
 	//  ----- scan and add method to container ---
-
 	for _, handler := range bs.modContext.Provider.bindingFuns {
-
-		injector.container.Provide(handler)
-
+		err = injector.container.Provide(handler)
+		if err != nil {
+			break
+		}
+	}
+	if err != nil {
+		return injector, err
 	}
 
 	// ---- call register function ----
 	for _, iFunc := range bs.modContext.Provider.beanFuns {
-		injector.container.Invoke(iFunc)
+		err = injector.container.Invoke(iFunc)
+		if err != nil {
+			break
+		}
+	}
+
+	if err != nil {
+		return injector, err
 	}
 
 	// ---- handle and pass bean to application ctx
-	injector.container.Invoke(passApplicationContextFromBeanContext)
-
-	return injector
+	err = injector.container.Invoke(passApplicationContextFromBeanContext)
+	return injector, err
 }
 
 /**
