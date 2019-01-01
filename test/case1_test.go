@@ -13,6 +13,11 @@ import (
  */
 func TestDI_module_case01(t *testing.T) {
 
+	annoConf := new(di.AnnotationConfig)
+	annoConf.AnnotationSupport = true
+
+	di.Config(annoConf)
+
 	// ----- register module pre defined ----
 	bs := di.RegisterModules(&modules.Case1Module{})
 

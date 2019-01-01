@@ -22,6 +22,8 @@ func createInjector(bs providerstore) (*injector, error) {
 		return injector, err
 	}
 
+	// ---- scan all object first ----
+
 	//  ----- scan and add method to container ---
 	for _, handler := range bs.modContext.Provider.bindingFuns {
 		err = injector.container.Provide(handler)

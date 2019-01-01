@@ -9,6 +9,11 @@ import (
 )
 
 /**
+ * set config handle
+ */
+var annotation = false
+
+/**
  * define module interface
  */
 type Module interface {
@@ -95,6 +100,15 @@ func RegisterModules(mods ...Module) providerstore {
 	bs := providerstore{modContext}
 
 	return bs
+}
+
+/**
+ * config the base inject environment
+ */
+func Config(annoConf *AnnotationConfig) {
+
+	annotation = annoConf.AnnotationSupport
+
 }
 
 /**
