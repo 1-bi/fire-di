@@ -15,7 +15,7 @@ import (
 func TestDI_module_case03(t *testing.T) {
 
 	annoMod := new(modules.InjectSupportedModule)
-	module := tm.AnnotationSupportedModule{annoMod}
+	module := tm.Case3Module{annoMod}
 
 	// ----- register module pre defined ----
 	bs := di.RegisterModules(&module)
@@ -27,11 +27,11 @@ func TestDI_module_case03(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		injector.Execute(bootstrapCase2)
+		injector.Execute(bootstrapCase3)
 	}
 
 }
 
-func bootstrapCase3(helper *mockobject.Case2MockObj1) {
+func bootstrapCase3(helper *mockobject.Case3MockObj1) {
 	helper.SayHello()
 }
