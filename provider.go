@@ -19,12 +19,31 @@ type provider struct {
 }
 
 func (this *provider) Provide(handlers ...interface{}) error {
+
 	// ---- get all handles ----
 	for _, handler := range handlers {
 
 		fn := funcName(handler)
 
 		this.bindingFuns[fn] = handler
+
+		targetFun := handler
+
+		// ---- create proxy ----
+		var decoratedFunc, targetFunc reflect.Value
+		targetFunc = reflect.ValueOf(handler)
+		decoratedFunc = reflect.ValueOf(targetFun).Elem()
+
+		v := reflect.MakeFunc(targetFunc.Type(),
+			func(in []reflect.Value) (out []reflect.Value) {
+				fmt.Println("before")
+				out = targetFunc.Call(in)
+				fmt.Println("after")
+				return
+			})
+		decoratedFunc.Set(v)
+
+		fmt.Println(v)
 
 	}
 	return nil
