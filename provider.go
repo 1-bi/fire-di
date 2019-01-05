@@ -18,6 +18,9 @@ type provider struct {
 	beanFuns      map[string]interface{}
 }
 
+/**
+ * @deprecate method
+ */
 func (this *provider) Provide(handlers ...interface{}) error {
 
 	// ---- get all handles ----
@@ -27,26 +30,28 @@ func (this *provider) Provide(handlers ...interface{}) error {
 
 		this.bindingFuns[fn] = handler
 
-		targetFun := handler
-
-		// ---- create proxy ----
-		var decoratedFunc, targetFunc reflect.Value
-		targetFunc = reflect.ValueOf(handler)
-		decoratedFunc = reflect.ValueOf(targetFun).Elem()
-
-		v := reflect.MakeFunc(targetFunc.Type(),
-			func(in []reflect.Value) (out []reflect.Value) {
-				fmt.Println("before")
-				out = targetFunc.Call(in)
-				fmt.Println("after")
-				return
-			})
-		decoratedFunc.Set(v)
-
-		fmt.Println(v)
-
 	}
 	return nil
+}
+
+/**
+ * add provide function for proxy object
+ */
+func (this *provider) ProvideFunc(orginFun interface{}, fptr interface{}) error {
+
+	// ---- create proxy ---
+	this.provideProxyInjector(fptr, orginFun)
+
+	proxyHandler := reflect.ValueOf(fptr).Elem().Interface()
+
+	/**
+	 * define the base fun name
+	 */
+	fn := funcName(orginFun)
+	this.bindingFuns[fn] = proxyHandler
+
+	return nil
+
 }
 
 // --- call and bind bean
@@ -68,7 +73,7 @@ func (this *provider) Invoke(handlers ...interface{}) error {
 	return nil
 }
 
-// ======================= private method
+// ======================= private method ==================
 
 /**
  * defined method binding
@@ -83,4 +88,31 @@ func (this *provider) String() string {
  */
 func createProvider() *provider {
 	return &provider{make([]error, 0), nil, make(map[string]interface{}), make(map[reflect.Type]reflect.Type), make([]interface{}, 0), make(map[string]interface{})}
+}
+
+func (this *provider) provideProxyInjector(fptr interface{}, orgFun interface{}) {
+
+	// --- define the target function element ----
+	fn := reflect.ValueOf(fptr).Elem()
+
+	refOrgFun := reflect.ValueOf(orgFun)
+
+	v := reflect.MakeFunc(fn.Type(), func(in []reflect.Value) []reflect.Value {
+
+		var out []reflect.Value
+
+		out = make([]reflect.Value, 0)
+
+		callOut := refOrgFun.Call(in)
+
+		// --- append out value ---
+
+		for _, cOut := range callOut {
+			out = append(out, cOut)
+		}
+
+		return out
+	})
+
+	fn.Set(v)
 }
