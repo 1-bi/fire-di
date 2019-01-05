@@ -19,16 +19,21 @@ type provider struct {
 }
 
 /**
- * @deprecate method
+ * fix new bug
  */
 func (this *provider) Provide(handlers ...interface{}) error {
+
+	var err error
 
 	// ---- get all handles ----
 	for _, handler := range handlers {
 
-		fn := funcName(handler)
+		//fn := funcName(handler)
 
-		this.bindingFuns[fn] = handler
+		err = this.privateFun(handler)
+		if err != nil {
+			return err
+		}
 
 	}
 	return nil
@@ -37,19 +42,21 @@ func (this *provider) Provide(handlers ...interface{}) error {
 /**
  * add provide function for proxy object
  */
-func (this *provider) ProvideFunc(orginFun interface{}, fptr interface{}) error {
+func (this *provider) privateFun(orginFun interface{}) error {
+
+	orgVal := reflect.ValueOf(orginFun)
+	fptrRefVal := reflect.New(orgVal.Type())
 
 	// ---- create proxy ---
-	this.provideProxyInjector(fptr, orginFun)
+	this.provideProxyInjector(fptrRefVal, orginFun)
 
-	proxyHandler := reflect.ValueOf(fptr).Elem().Interface()
+	proxyHandler := fptrRefVal.Elem().Interface()
 
 	/**
 	 * define the base fun name
 	 */
 	fn := funcName(orginFun)
 	this.bindingFuns[fn] = proxyHandler
-
 	return nil
 
 }
@@ -90,10 +97,10 @@ func createProvider() *provider {
 	return &provider{make([]error, 0), nil, make(map[string]interface{}), make(map[reflect.Type]reflect.Type), make([]interface{}, 0), make(map[string]interface{})}
 }
 
-func (this *provider) provideProxyInjector(fptr interface{}, orgFun interface{}) {
+func (this *provider) provideProxyInjector(fptr reflect.Value, orgFun interface{}) {
 
 	// --- define the target function element ----
-	fn := reflect.ValueOf(fptr).Elem()
+	fn := fptr.Elem()
 
 	refOrgFun := reflect.ValueOf(orgFun)
 
@@ -106,7 +113,6 @@ func (this *provider) provideProxyInjector(fptr interface{}, orgFun interface{})
 		callOut := refOrgFun.Call(in)
 
 		// --- append out value ---
-
 		for _, cOut := range callOut {
 			out = append(out, cOut)
 		}
