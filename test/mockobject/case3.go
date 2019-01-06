@@ -9,6 +9,17 @@ func (this *Case3MockObj1) SayHello() {
 	fmt.Println("case 3 mock object 1 ")
 }
 
+/**
+ * @Inject inject object
+ */
+func (this *Case3MockObj1) Inject(co *Case3MockObj2, c3 *Case3MockObj3) {
+	fmt.Println("  inject new object ")
+	fmt.Println(co)
+	co.SayHello()
+
+	c3.SayHello()
+}
+
 type Case3MockObj2 struct {
 }
 

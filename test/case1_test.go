@@ -13,11 +13,6 @@ import (
  */
 func TestDI_module_case01(t *testing.T) {
 
-	annoConf := new(di.AnnotationConfig)
-	annoConf.AnnotationSupport = true
-
-	di.Config(annoConf)
-
 	// ----- register module pre defined ----
 	bs := di.RegisterModules(&modules.Case1Module{})
 
@@ -30,8 +25,15 @@ func TestDI_module_case01(t *testing.T) {
 	} else {
 		injector.Execute(bootstrapCase1)
 	}
+
 }
 
-func bootstrapCase1(helper *mockobject.Case1Helper) {
+func bootstrapCase1(helper *mockobject.Case1MockObj1) {
+
+	log.SetPrefix("bootstrapCase1: ")
+
+	log.Print(" Start to invoke function  -> ")
 	helper.SayHello()
+	log.Print(" End to invoke function  <- ")
+
 }
