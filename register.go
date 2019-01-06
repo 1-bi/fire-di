@@ -54,12 +54,22 @@ func (this *register) RegBean(registerBean *RegisterBean) {
 
 	for methodName, m := range proxyBean.methods {
 
-		if !strings.HasPrefix(methodName, "Inject") {
-			continue
+		var matchPrefix bool
+
+		// --- check the use define prefix method prefix ---
+		for _, prefix := range runnimeConf.injectMethodPrefix {
+
+			if !strings.HasPrefix(methodName, prefix) {
+				matchPrefix = true
+				break
+			}
 		}
 
-		// ---- invoke method bean ---
-		this.Invoke(m.Func.Interface())
+		if matchPrefix {
+			// ---- invoke method bean ---
+			this.Invoke(m.Func.Interface())
+
+		}
 	}
 
 }

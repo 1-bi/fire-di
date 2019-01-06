@@ -12,7 +12,7 @@ import (
 /**
  * set config handle
  */
-var annotation = false
+var runnimeConf = new(baseConfigration)
 
 /**
  * define module interface
@@ -97,9 +97,16 @@ func RegisterModules(mods ...Module) providerstore {
 /**
  * config the base inject environment
  */
-func Config(annoConf *AnnotationConfig) {
+func Config(conf *Configuration) {
 
-	annotation = annoConf.AnnotationSupport
+	inMethodPrefix := conf.baseConfigration.injectMethodPrefix
+
+	lenMethodPrefix := len(inMethodPrefix)
+
+	// --- use  default ---
+	if lenMethodPrefix == 0 {
+		runnimeConf.injectMethodPrefix = []string{"Inject"}
+	}
 
 }
 

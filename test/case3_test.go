@@ -2,7 +2,6 @@ package test
 
 import (
 	di "github.com/1-bi/fire-di"
-	"github.com/1-bi/fire-di/modules"
 	"github.com/1-bi/fire-di/test/mockobject"
 	tm "github.com/1-bi/fire-di/test/modules"
 	"log"
@@ -10,12 +9,18 @@ import (
 )
 
 /**
- * sample case 01 for generate id
+ * case 3 , add project
  */
 func TestDI_module_case03(t *testing.T) {
 
-	annoMod := new(modules.InjectSupportedModule)
-	module := tm.Case3Module{annoMod}
+	diConf := new(di.Configuration)
+
+	/**
+	 * custom  di config
+	 */
+	di.Config(diConf)
+
+	module := tm.Case3Module{}
 
 	// ----- register module pre defined ----
 	bs := di.RegisterModules(&module)

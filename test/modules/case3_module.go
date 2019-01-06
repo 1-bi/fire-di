@@ -2,12 +2,10 @@ package modules
 
 import (
 	di "github.com/1-bi/fire-di"
-	"github.com/1-bi/fire-di/modules"
 	"github.com/1-bi/fire-di/test/mockobject"
 )
 
 type Case3Module struct {
-	Parent *modules.InjectSupportedModule
 }
 
 func (this *Case3Module) Bind(ctx di.ModuleContext) {

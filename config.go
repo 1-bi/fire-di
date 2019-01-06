@@ -1,12 +1,20 @@
 package fire_di
 
+type baseConfigration struct {
+	injectMethodPrefix []string
+}
+
+func (this *baseConfigration) getInjectMethodPrefix() []string {
+	return this.injectMethodPrefix
+}
+
 /**
  * get the annotaion config
  */
-type AnnotationConfig struct {
+type Configuration struct {
+	baseConfigration
+}
 
-	/**
-	 * set the base annotation define
-	 */
-	AnnotationSupport bool
+func (this *Configuration) SetInjectMethodPrefix(method ...string) {
+	this.injectMethodPrefix = method
 }
