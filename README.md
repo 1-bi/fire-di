@@ -1,6 +1,8 @@
 # Fire-di Framework
 
-[![release](https://img.shields.io/badge/release%20-v0.1.0-red.svg)](https://github.com/1-bi/fire-di/releases) [![Go Report Card](https://goreportcard.com/badge/github.com/1-bi/fire-di)](https://goreportcard.com/report/github.com/1-bi/fire-di)
+[![release](https://img.shields.io/badge/release%20-v0.1.0-red.svg)](https://github.com/1-bi/fire-di/releases)
+[![GoDoc](https://godoc.org/github.com/1-bi/fire-di?status.svg)](https://godoc.org/github.com/1-bi/fire-di)
+[![Go Report Card](https://goreportcard.com/badge/github.com/1-bi/fire-di)](https://goreportcard.com/report/github.com/1-bi/fire-di)
 
 自定义的依整注入框架
 
