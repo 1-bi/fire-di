@@ -1,5 +1,7 @@
 # Fire-di Framework
 
+[![release](https://img.shields.io/badge/release%20-v0.1.0-0077b3.svg?style=flat-square)](https://github.com/1-bi/fire-di/releases)
+
 自定义的依整注入框架
 
 
