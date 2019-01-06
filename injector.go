@@ -25,19 +25,8 @@ func createInjector(bs providerstore) (*injector, error) {
 	// ---- scan all object first ----
 
 	//  ----- scan and add method to container ---
-	for _, handler := range bs.modContext.Provider.bindingFuns {
+	for _, handler := range bs.modContext.GetRegister().bindingFuns {
 		err = injector.container.Provide(handler)
-		if err != nil {
-			break
-		}
-	}
-	if err != nil {
-		return injector, err
-	}
-
-	// ---- call register function ----
-	for _, iFunc := range bs.modContext.Provider.beanFuns {
-		err = injector.container.Invoke(iFunc)
 		if err != nil {
 			break
 		}
@@ -48,8 +37,36 @@ func createInjector(bs providerstore) (*injector, error) {
 	}
 
 	// ---- handle and pass bean to application ctx
-	err = injector.container.Invoke(passApplicationContextFromBeanContext)
+	err = injector.container.Invoke(initApplicationContextFromBeanContext)
+
+	// ---- call register function ----
+	for _, iFunc := range bs.modContext.GetRegister().beanFuns {
+		err = injector.container.Invoke(iFunc)
+		if err != nil {
+			break
+		}
+	}
+
+	if err != nil {
+		return injector, err
+	}
+
 	return injector, err
+}
+
+/**
+ * define proxy message
+ */
+func (i *injector) scanProxyInject(proxies map[string]*proxyObject) error {
+
+	for proxyName, proxyRef := range proxies {
+
+		fmt.Println(proxyName)
+		fmt.Println(proxyRef)
+
+	}
+
+	return nil
 }
 
 /**
@@ -71,6 +88,7 @@ func (i *injector) Execute(funcs ...interface{}) error {
 
 	for _, fn := range funcs {
 		fname := funcName(fn)
+
 		err = i.container.Invoke(fn)
 
 		if err != nil {
@@ -91,7 +109,13 @@ func createBeanCtxBinderAndApplicationCtx() (beanContextBinder *BeanCtxBinder, a
 
 }
 
-func passApplicationContextFromBeanContext(beanCtx *BeanCtxBinder, appCtx *AppCtx) {
+/**
+ * init base call application ctx binder
+ */
+func initApplicationContextFromBeanContext(beanCtx *BeanCtxBinder, appCtx *AppCtx) {
+
+	fmt.Println("out ----------- ")
+	fmt.Println(beanCtx.bindBeans)
 
 	for bindingKey, bindingRefObj := range beanCtx.bindings {
 

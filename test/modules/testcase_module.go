@@ -10,7 +10,7 @@ type Case1Module struct {
 
 func (this *Case1Module) Bind(ctx di.ModuleContext) {
 
-	ctx.GetProvider().Provide(this.provideCase1Helper)
+	ctx.GetRegister().Provide(this.provideCase1Helper)
 }
 
 func (this *Case1Module) provideCase1Helper() *mockobject.Case1Helper {

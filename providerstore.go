@@ -1,7 +1,7 @@
 package fire_di
 
 /**
- * create provider store handle
+ * create register store handle
  */
 type providerstore struct {
 	modContext BaseModuleContext

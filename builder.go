@@ -17,7 +17,7 @@ func newNoOpBuilder() InterfaceBuilder {
 	return &noOpBuilder{}
 }
 
-func (n *noOpBuilder) ToSingleton(singleton interface{}) {}
+func (n *noOpBuilder) ToProxyInst(singleton reflect.Value) {}
 
 /**
  * create base builder object
@@ -31,14 +31,42 @@ func newBuilder(binder *BeanCtxBinder, bindingKeys []bindingKey) InterfaceBuilde
 	return &baseBuilder{binder, bindingKeys}
 }
 
-func (this *baseBuilder) ToSingleton(singleton interface{}) {
+/**
+ * bind base proxy
+ */
+func (this *baseBuilder) getProxy(ref interface{}) *proxyObject {
+	proxyObj := new(proxyObject)
+	proxyObj.ref = ref
+	objType := reflect.TypeOf(ref)
+
+	methodMap := make(map[string]reflect.Method, 0)
+	var i int
+	for i = 0; i < objType.NumMethod(); i++ {
+		m := objType.Method(i)
+		methodMap[m.Name] = m
+	}
+	proxyObj.methods = methodMap
+
+	return proxyObj
+}
+
+/**
+ * create proxy instance
+ */
+func (this *baseBuilder) ToProxyInst(singletonVal reflect.Value) {
 	// use instance for singleton
-	this.to(singleton, verifyInterfaceReflectType, newSingletonBinding)
+	//this.to(singleton, verifyInterfaceReflectType, newSingletonBinding)
+
+	// create proxy instance
+	proxyObj := this.getProxy(singletonVal.Interface())
+
+	// --- check binding object
+	this.beanCtx.bindProxyInst(proxyObj, singletonVal.Type())
 
 }
 
-func (this *baseBuilder) to(object interface{}, verifyFunc func(reflect.Type, reflect.Type) error, newBindingFunc func(interface{}) binding) {
-	objectReflectType := reflect.TypeOf(object)
+func (this *baseBuilder) to(object reflect.Value, verifyFunc func(reflect.Type, reflect.Type) error, newBindingFunc func(interface{}) binding) {
+	objectReflectType := object.Type()
 
 	for _, bindingKey := range this.bindingKeys {
 		if err := verifyFunc(bindingKey.reflectType(), objectReflectType); err != nil {

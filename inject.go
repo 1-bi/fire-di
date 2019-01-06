@@ -6,6 +6,7 @@ package fire_di
 
 import (
 	"fmt"
+	"reflect"
 )
 
 /**
@@ -24,7 +25,7 @@ type Module interface {
  * define module context
  */
 type ModuleContext interface {
-	GetProvider() *provider
+	GetRegister() *register
 }
 
 /**
@@ -62,7 +63,7 @@ type ApplicationContext interface {
 // Builder is the return value from a Bind call from a Module.
 type Builder interface {
 	// --- bind singleton object ----
-	ToSingleton(singleton interface{})
+	ToProxyInst(singleton reflect.Value)
 }
 
 // InterfaceBuilder is the return value when binding an interface from a Module.
@@ -72,15 +73,6 @@ type InterfaceBuilder interface {
 
 // Injector is setting for injecto ioc handle
 type Injector interface {
-	/**
-	 * get instance for interface
-	 */
-	//GetInstance(from interface{}) (interface{}, error)
-
-	/**
-	 * get instance for interface with tag named
-	 */
-	//GetInstanceTagged(tag string, from interface{}) (interface{}, error)
 
 	/**
 	 * create injector application

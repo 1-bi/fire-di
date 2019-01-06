@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"errors"
 	"fmt"
 	di "github.com/1-bi/fire-di"
 	"github.com/1-bi/fire-di/test/mockobject"
@@ -11,17 +12,18 @@ type Case2Module struct {
 
 func (this *Case2Module) Bind(ctx di.ModuleContext) {
 
-	ctx.GetProvider().Provide(this.provideCase2Obj1)
-	ctx.GetProvider().Provide(this.provideCase2Obj2)
-	//ctx.GetProvider().Provide( this.provideCase2Obj3)
+	ctx.GetRegister().Provide(this.provideCase2Obj1)
+	ctx.GetRegister().Provide(this.provideCase2Obj2)
+	//ctx.GetRegister().Provide( this.provideCase2Obj3)
 
-	ctx.GetProvider().InjectBean(this.injectCase2)
+	ctx.GetRegister().InjectBean(this.injectCase2)
 
 }
 
-func (this *Case2Module) provideCase2Obj1() *mockobject.Case2MockObj1 {
+func (this *Case2Module) provideCase2Obj1() (*mockobject.Case2MockObj1, error) {
 	case1 := mockobject.Case2MockObj1{}
-	return &case1
+
+	return &case1, errors.New("hello message.")
 }
 
 func (this *Case2Module) provideCase2Obj2() *mockobject.Case2MockObj2 {

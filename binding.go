@@ -7,7 +7,7 @@ import (
 type binding interface {
 	fmt.Stringer
 	// has to be a copy constructor
-	resolvedBinding(*provider, *injector) (resolvedBinding, error)
+	resolvedBinding(*register, *injector) (resolvedBinding, error)
 }
 
 type resolvedBinding interface {
@@ -37,6 +37,6 @@ func (s *singletonBinding) get() (interface{}, error) {
 	return s.singleton, nil
 }
 
-func (s *singletonBinding) resolvedBinding(provider *provider, injector *injector) (resolvedBinding, error) {
+func (s *singletonBinding) resolvedBinding(provider *register, injector *injector) (resolvedBinding, error) {
 	return &singletonBinding{s.singleton, injector}, nil
 }

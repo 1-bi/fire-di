@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -19,6 +20,25 @@ func funcName(fn interface{}) string {
 
 	function := runtime.FuncForPC(fnV.Pointer()).Name()
 	return fmt.Sprintf("%s()", function)
+}
+
+func funcNameProvide(regBean *RegisterBean) string {
+
+	var beanStr, funStr, funcName string
+	beanTypeName := reflect.TypeOf(regBean.Bean)
+
+	beanStr = beanTypeName.String()
+
+	// --- check the func type
+	funTypeName := reflect.ValueOf(regBean.ProvideFun).Elem()
+	if funTypeName.Kind() != reflect.Func {
+		funStr = "n/a"
+	} else {
+		funStr = funTypeName.Type().String()
+	}
+
+	funcName = strings.Join([]string{beanStr, funStr}, ":")
+	return funcName
 }
 
 // whitelisting types to make sure the framework works

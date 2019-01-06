@@ -8,10 +8,13 @@ import (
  * define beanCtx object
  */
 type BaseModuleContext struct {
-	Provider *provider
+	Provider *register
 }
 
-func (this *BaseModuleContext) GetProvider() *provider {
+/**
+ * get base register define
+ */
+func (this *BaseModuleContext) GetRegister() *register {
 	return this.Provider
 }
 

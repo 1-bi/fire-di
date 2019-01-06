@@ -9,11 +9,25 @@ import (
 type BeanCtxBinder struct {
 	bindingErrors []error
 	bindings      map[bindingKey]binding
+
+	aliasNameMapping map[string]reflect.Type
+	bindBeans        map[reflect.Type]*proxyObject
 }
 
 func (this *BeanCtxBinder) Bind(froms ...interface{}) Builder {
 	// ---- create builder ----
 	return this.bind(newBindingKey, froms)
+}
+
+/**
+ *  define alias type name
+ */
+func (this *BeanCtxBinder) alias(aliasType string, dstType reflect.Type) {
+	this.aliasNameMapping[aliasType] = dstType
+}
+
+func (this *BeanCtxBinder) bindProxyInst(proxyBean *proxyObject, refType reflect.Type) {
+	this.bindBeans[refType] = proxyBean
 }
 
 // -------------------- bind context -------------
@@ -31,6 +45,7 @@ func (this *BeanCtxBinder) bind(newBindingKeyFunc func(reflect.Type) bindingKey,
 	bindingKeys := make([]bindingKey, lenFrom)
 
 	for i := 0; i < lenFrom; i++ {
+
 		fromReflectType := reflect.TypeOf(from[i])
 
 		if fromReflectType == nil {
@@ -72,7 +87,8 @@ func (this *BeanCtxBinder) String() string {
  * create new beanCtx implement
  */
 func createBeanCtxBinder() *BeanCtxBinder {
-	return &BeanCtxBinder{make([]error, 0), make(map[bindingKey]binding)}
+	return &BeanCtxBinder{make([]error, 0), make(map[bindingKey]binding),
+		make(map[string]reflect.Type, 0), make(map[reflect.Type]*proxyObject, 0)}
 }
 
 /**
