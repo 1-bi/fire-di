@@ -114,9 +114,6 @@ func createBeanCtxBinderAndApplicationCtx() (beanContextBinder *BeanCtxBinder, a
  */
 func initApplicationContextFromBeanContext(beanCtx *BeanCtxBinder, appCtx *AppCtx) {
 
-	fmt.Println("out ----------- ")
-	fmt.Println(beanCtx.bindBeans)
-
 	for bindingKey, bindingRefObj := range beanCtx.bindings {
 
 		resolvedBinding, err := bindingRefObj.resolvedBinding(nil, nil)

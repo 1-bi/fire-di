@@ -8,6 +8,15 @@ import (
 )
 
 /**
+ * define register bean
+ */
+type RegisterBean struct {
+	// define base bean
+	Bean       interface{}
+	ProvideFun interface{}
+}
+
+/**
  * beanCtx for beanCtx
  */
 type register struct {
@@ -17,36 +26,6 @@ type register struct {
 	bindingType   map[reflect.Type]reflect.Type
 	invokedFuns   []interface{}
 	beanFuns      map[string]interface{}
-}
-
-/**
- * define register bean
- */
-type RegisterBean struct {
-	// define base bean
-	Bean interface{}
-
-	ProvideFun interface{}
-}
-
-/**
- * fix new bug
- */
-// Deprecated:  this method would be remove in next version
-func (this *register) Provide(handlers ...interface{}) error {
-
-	var err error
-
-	// ---- get all handles ----
-	for _, handler := range handlers {
-
-		err = this.privateFun(handler)
-		if err != nil {
-			return err
-		}
-
-	}
-	return nil
 }
 
 /**
@@ -101,30 +80,6 @@ func (this *register) getProxy(ref interface{}) *proxyObject {
 	return proxyObj
 }
 
-/**
- * add provide function for proxy object
- * fire the event when add the provide in method ---
- */
-func (this *register) privateFun(orginFun interface{}) error {
-
-	orgVal := reflect.ValueOf(orginFun)
-	fptrRefVal := reflect.New(orgVal.Type())
-
-	// ---- create proxy ---
-	this.provideProxyInjector(fptrRefVal, orginFun)
-
-	proxyHandler := fptrRefVal.Elem().Interface()
-
-	/**
-	 * define the base fun name
-	 */
-	fn := funcName(orginFun)
-	this.bindingFuns[fn] = proxyHandler
-
-	return nil
-
-}
-
 // --- call and bind bean
 func (this *register) InjectBean(beanFun interface{}) error {
 
@@ -162,55 +117,4 @@ func createProvider() *register {
 		nil, make(map[string]interface{}), make(map[reflect.Type]reflect.Type),
 		make([]interface{}, 0), make(map[string]interface{}),
 	}
-}
-
-func (this *register) provideProxyInjector(fptr reflect.Value, orgFun interface{}) {
-
-	// --- define the target function element ----
-	fn := fptr.Elem()
-
-	refOrgFun := reflect.ValueOf(orgFun)
-
-	v := reflect.MakeFunc(fn.Type(), func(in []reflect.Value) []reflect.Value {
-
-		// --- check the bean context ---
-		/*
-			var bcb *BeanCtxBinder
-			for _, input := range in {
-
-				if reflect.TypeOf( (*BeanCtxBinder)(nil) ) == input.Type() {
-					bcb = input.Interface().(*BeanCtxBinder)
-				}
-			}
-
-			if bcb == nil {
-				// --- throw error ----
-			}
-		*/
-		var out []reflect.Value
-		out = make([]reflect.Value, 0)
-		callOut := refOrgFun.Call(in)
-
-		// --- append out value ---
-		for _, cOut := range callOut {
-
-			// --- set the alias name ---
-			/*
-				if reflect.Ptr == cOut.Kind() {
-					bcb.alias( cOut.Elem().Type().String() , cOut.Type() )
-				}
-				builder := bcb.Bind(  cOut.Type() )
-				builder.ToProxyInst( cOut )
-			*/
-
-			out = append(out, cOut)
-			// ---- chck error -----
-
-		}
-		//fmt.Println( out  )
-
-		return out
-	})
-
-	fn.Set(v)
 }

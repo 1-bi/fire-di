@@ -17,6 +17,9 @@ func (this *Case3Module) Bind(ctx di.ModuleContext) {
 	ctx.GetRegister().RegBean(this.provideCase3Obj3())
 }
 
+/**
+ * define base the object method
+ */
 func (this *Case3Module) provideCase3Obj1() *di.RegisterBean {
 
 	var pro func() *mockobject.Case3MockObj1
