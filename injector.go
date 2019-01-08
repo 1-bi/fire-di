@@ -2,7 +2,10 @@ package fire_di
 
 import (
 	"fmt"
+	"github.com/1-bi/fire-di/test/mockobject"
 	"go.uber.org/dig"
+	"reflect"
+	"strings"
 )
 
 type injector struct {
@@ -87,6 +90,11 @@ func (i *injector) Execute(funcs ...interface{}) error {
 	}
 
 	for _, fn := range funcs {
+
+		// ---- create proxy function ---
+
+		//proxyFn := getFunProxy( fn )
+
 		fname := funcName(fn)
 
 		err = i.container.Invoke(fn)
@@ -97,7 +105,55 @@ func (i *injector) Execute(funcs ...interface{}) error {
 		}
 	}
 
+	b := mockobject.Case3MockObj2{}
+
+	prox := new(proxyInjectObject)
+	prox.ref = &b
+	prox.getProxyInvokeFun()
+
 	return err
+}
+
+func getFunProxy(orgFn interface{}) interface{} {
+
+	fprtTyp := reflect.TypeOf(orgFn)
+
+	targetFun := reflect.New(fprtTyp).Elem()
+
+	v := reflect.MakeFunc(targetFun.Type(), func(args []reflect.Value) (results []reflect.Value) {
+
+		fmt.Println("-hellomoo")
+		if len(args) == 0 {
+			return nil
+		}
+
+		var ret reflect.Value
+
+		switch args[0].Kind() {
+		case reflect.Int:
+			n := 0
+			for _, a := range args {
+				n += int(a.Int())
+			}
+
+			ret = reflect.ValueOf(n)
+		case reflect.String:
+			ss := make([]string, 0, len(args))
+			for _, s := range args {
+				ss = append(ss, s.String())
+			}
+
+			ret = reflect.ValueOf(strings.Join(ss, ""))
+		}
+
+		results = append(results, ret)
+		return
+	})
+
+	targetFun.Set(v)
+
+	return targetFun.Interface()
+
 }
 
 // ================== private function area ====================
