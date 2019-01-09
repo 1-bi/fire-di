@@ -39,10 +39,15 @@ func (this *Case3Module) provideCase3Obj2() *di.RegisterBean {
 }
 
 func (this *Case3Module) provideCase3Obj3() *di.RegisterBean {
+	var case3MockObj = new(mockobject.Case3MockObj3)
 
-	var pro func(beanContextBinder *di.BeanCtxBinder) *mockobject.Case3MockObj3
+	var pro = func(beanContextBinder *di.BeanCtxBinder) *mockobject.Case3MockObj3 {
+		return case3MockObj
+	}
+
+	//var pro func(beanContextBinder *di.BeanCtxBinder) *mockobject.Case3MockObj3
 	rb := new(di.RegisterBean)
-	rb.Bean = &mockobject.Case3MockObj3{}
+	rb.Bean = case3MockObj
 	rb.ProvideFun = &pro
 
 	return rb

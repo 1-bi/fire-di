@@ -2,7 +2,6 @@ package fire_di
 
 import (
 	"fmt"
-	"github.com/1-bi/fire-di/test/mockobject"
 	"go.uber.org/dig"
 	"reflect"
 	"strings"
@@ -105,15 +104,12 @@ func (i *injector) Execute(funcs ...interface{}) error {
 		}
 	}
 
-	b := mockobject.Case3MockObj2{}
-
-	prox := new(proxyInjectObject)
-	prox.ref = &b
-	prox.getProxyInvokeFun()
-
 	return err
 }
 
+/**
+ * not use object
+ */
 func getFunProxy(orgFn interface{}) interface{} {
 
 	fprtTyp := reflect.TypeOf(orgFn)
