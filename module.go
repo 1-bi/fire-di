@@ -4,18 +4,14 @@ import (
 	"gitlab.com/1-bi/log-api/loggerzap"
 )
 
-/**
- * define beanCtx object
- */
+// BaseModuleContext define beanCtx object
 type BaseModuleContext struct {
 	Provider *register
 }
 
-/**
- * get base register define
- */
-func (this *BaseModuleContext) GetRegister() *register {
-	return this.Provider
+// GetRegister get base register define
+func (myself *BaseModuleContext) GetRegister() *register {
+	return myself.Provider
 }
 
 /**

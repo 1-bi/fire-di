@@ -14,23 +14,17 @@ import (
  */
 var runnimeConf = new(baseConfigration)
 
-/**
- * define module interface
- */
+// Module define module interface
 type Module interface {
 	Bind(ctx ModuleContext)
 }
 
-/**
- * define module context
- */
+// ModuleContext define module context
 type ModuleContext interface {
 	GetRegister() *register
 }
 
-/**
- * create beanCtx interface
- */
+// Binder create beanCtx interface
 type Binder interface {
 	fmt.Stringer
 
@@ -44,16 +38,12 @@ type Binder interface {
 	Invoke(handlers ...interface{}) error
 }
 
-/**
- * create application inject
- */
+// CtxBinder create application inject
 type CtxBinder interface {
 	Bind(itypes ...interface{}) Builder
 }
 
-/**
- * --- create application context ----
- */
+// ApplicationContext --- create application context ----
 type ApplicationContext interface {
 
 	// ---- get application method ----
@@ -80,9 +70,7 @@ type Injector interface {
 	Execute(funcs ...interface{}) error
 }
 
-/**
- * create function handle for beanCtx
- */
+// RegisterModules create function handle for beanCtx
 func RegisterModules(mods ...Module) providerstore {
 
 	// --- call beanCtx register function ----
@@ -94,9 +82,7 @@ func RegisterModules(mods ...Module) providerstore {
 	return bs
 }
 
-/**
- * config the base inject environment
- */
+// Config config the base inject environment
 func Config(conf *Configuration) {
 
 	inMethodPrefix := conf.baseConfigration.injectMethodPrefix
@@ -110,9 +96,7 @@ func Config(conf *Configuration) {
 
 }
 
-/**
- * create injecto for object
- */
+// CreateInjector create injecto for object
 func CreateInjector(bs providerstore) (*injector, error) {
 
 	injector, err := createInjector(bs)
@@ -120,13 +104,9 @@ func CreateInjector(bs providerstore) (*injector, error) {
 	return injector, err
 }
 
-/**
- * dev support api
- */
+// InjectAwaredSupport dev support api
 type InjectAwaredSupport interface {
 
-	/**
-	 * defined provide method
-	 */
+	// ProvideMethod defined provide method
 	ProvideMethod() []interface{}
 }

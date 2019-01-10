@@ -12,6 +12,26 @@ import (
 type proxyObject struct {
 	ref     interface{}
 	methods map[string]reflect.Method
+
+	injectMethod map[string]reflect.Method
+}
+
+// apply proxy to self
+func (myself *proxyObject) applyProxy(src interface{}) {
+
+	objType := reflect.TypeOf(src)
+
+	methodMap := make(map[string]reflect.Method, 0)
+	var i int
+	for i = 0; i < objType.NumMethod(); i++ {
+		m := objType.Method(i)
+		methodMap[m.Name] = m
+	}
+	myself.methods = methodMap
+
+	// --- define bean ---
+	myself.ref = src
+
 }
 
 type proxyInjectObject struct {

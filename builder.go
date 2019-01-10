@@ -34,7 +34,7 @@ func newBuilder(binder *BeanCtxBinder, bindingKeys []bindingKey) InterfaceBuilde
 /**
  * bind base proxy
  */
-func (this *baseBuilder) getProxy(ref interface{}) *proxyObject {
+func (myself *baseBuilder) getProxy(ref interface{}) *proxyObject {
 	proxyObj := new(proxyObject)
 	proxyObj.ref = ref
 	objType := reflect.TypeOf(ref)
@@ -53,24 +53,24 @@ func (this *baseBuilder) getProxy(ref interface{}) *proxyObject {
 /**
  * create proxy instance
  */
-func (this *baseBuilder) ToProxyInst(singletonVal reflect.Value) {
+func (myself *baseBuilder) ToProxyInst(singletonVal reflect.Value) {
 	// use instance for singleton
-	//this.to(singleton, verifyInterfaceReflectType, newSingletonBinding)
+	//myself.to(singleton, verifyInterfaceReflectType, newSingletonBinding)
 
 	// create proxy instance
-	proxyObj := this.getProxy(singletonVal.Interface())
+	proxyObj := myself.getProxy(singletonVal.Interface())
 
 	// --- check binding object
-	this.beanCtx.bindProxyInst(proxyObj, singletonVal.Type())
+	myself.beanCtx.bindProxyInst(proxyObj, singletonVal.Type())
 
 }
 
-func (this *baseBuilder) to(object reflect.Value, verifyFunc func(reflect.Type, reflect.Type) error, newBindingFunc func(interface{}) binding) {
+func (myself *baseBuilder) to(object reflect.Value, verifyFunc func(reflect.Type, reflect.Type) error, newBindingFunc func(interface{}) binding) {
 	objectReflectType := object.Type()
 
-	for _, bindingKey := range this.bindingKeys {
+	for _, bindingKey := range myself.bindingKeys {
 		if err := verifyFunc(bindingKey.reflectType(), objectReflectType); err != nil {
-			this.beanCtx.addBindingError(err)
+			myself.beanCtx.addBindingError(err)
 			return
 		}
 	}
@@ -78,15 +78,15 @@ func (this *baseBuilder) to(object reflect.Value, verifyFunc func(reflect.Type, 
 	binding := newBindingFunc(object)
 
 	// ---- output binding value ---
-	for _, bindingKey := range this.bindingKeys {
-		this.setBinding(bindingKey, binding)
+	for _, bindingKey := range myself.bindingKeys {
+		myself.setBinding(bindingKey, binding)
 	}
 
 }
 
-func (this *baseBuilder) setBinding(bindingKey bindingKey, binding binding) {
+func (myself *baseBuilder) setBinding(bindingKey bindingKey, binding binding) {
 
-	this.beanCtx.setBinding(bindingKey, binding)
+	myself.beanCtx.setBinding(bindingKey, binding)
 
 }
 

@@ -7,9 +7,7 @@ import (
 	"strings"
 )
 
-/**
- * define register bean
- */
+// RegisterBean define register bean
 type RegisterBean struct {
 	// define base bean
 	Bean       interface{}
@@ -31,10 +29,10 @@ type register struct {
 /**
  * register bean with the way "RegisterBean"
  */
-func (this *register) RegBean(registerBean *RegisterBean) {
+func (myself *register) RegBean(registerBean *RegisterBean) {
 
 	// --- create new function ---
-	proxyBean := this.getProxy(registerBean.Bean)
+	proxyBean := myself.getProxy(registerBean.Bean)
 
 	proxyProvided := func(fptr interface{}) {
 		fn := reflect.ValueOf(fptr).Elem()
@@ -48,7 +46,7 @@ func (this *register) RegBean(registerBean *RegisterBean) {
 	proxyHandler := reflect.ValueOf(registerBean.ProvideFun).Elem().Interface()
 
 	fn := funcNameProvide(registerBean)
-	this.bindingFuns[fn] = proxyHandler
+	myself.bindingFuns[fn] = proxyHandler
 
 	// --- check function with prefix "Inject" ---
 
@@ -67,43 +65,33 @@ func (this *register) RegBean(registerBean *RegisterBean) {
 
 		if matchPrefix {
 			// ---- invoke method bean ---
-			this.Invoke(m.Func.Interface())
+			myself.Invoke(m.Func.Interface())
 
 		}
 	}
 
 }
 
-func (this *register) getProxy(ref interface{}) *proxyObject {
+func (myself *register) getProxy(ref interface{}) *proxyObject {
 	proxyObj := new(proxyObject)
-	proxyObj.ref = ref
-	objType := reflect.TypeOf(ref)
-
-	methodMap := make(map[string]reflect.Method, 0)
-	var i int
-	for i = 0; i < objType.NumMethod(); i++ {
-		m := objType.Method(i)
-		methodMap[m.Name] = m
-	}
-	proxyObj.methods = methodMap
-
+	proxyObj.applyProxy(ref)
 	return proxyObj
 }
 
 // --- call and bind bean
-func (this *register) InjectBean(beanFun interface{}) error {
+func (myself *register) InjectBean(beanFun interface{}) error {
 
 	fn := funcName(beanFun)
 
-	this.beanFuns[fn] = beanFun
+	myself.beanFuns[fn] = beanFun
 
 	return nil
 }
 
-func (this *register) Invoke(handlers ...interface{}) error {
+func (myself *register) Invoke(handlers ...interface{}) error {
 	// ---- get all handles ----
 	for _, handler := range handlers {
-		this.invokedFuns = append(this.invokedFuns, handler)
+		myself.invokedFuns = append(myself.invokedFuns, handler)
 	}
 
 	return nil
@@ -115,7 +103,7 @@ func (this *register) Invoke(handlers ...interface{}) error {
  * defined method binding
  * implement function for inject api
  */
-func (this *register) String() string {
+func (myself *register) String() string {
 	return fmt.Sprintf("beanCtx{%s}", "update content ")
 }
 

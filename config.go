@@ -4,17 +4,16 @@ type baseConfigration struct {
 	injectMethodPrefix []string
 }
 
-func (this *baseConfigration) getInjectMethodPrefix() []string {
-	return this.injectMethodPrefix
+func (myself *baseConfigration) getInjectMethodPrefix() []string {
+	return myself.injectMethodPrefix
 }
 
-/**
- * get the annotaion config
- */
+// Configuration get the annotaion config
 type Configuration struct {
 	baseConfigration
 }
 
-func (this *Configuration) SetInjectMethodPrefix(method ...string) {
-	this.injectMethodPrefix = method
+// SetInjectMethodPrefix set inject method prefix
+func (myself *Configuration) SetInjectMethodPrefix(method ...string) {
+	myself.injectMethodPrefix = method
 }

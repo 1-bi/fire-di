@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-// ------- defined appp store ----
+// BeanCtxBinder  defined appp store
 type BeanCtxBinder struct {
 	bindingErrors []error
 	bindings      map[bindingKey]binding
@@ -14,31 +14,32 @@ type BeanCtxBinder struct {
 	bindBeans        map[reflect.Type]*proxyObject
 }
 
-func (this *BeanCtxBinder) Bind(froms ...interface{}) Builder {
+// Bind ... bind all interface
+func (myself *BeanCtxBinder) Bind(froms ...interface{}) Builder {
 	// ---- create builder ----
-	return this.bind(newBindingKey, froms)
+	return myself.bind(newBindingKey, froms)
 }
 
 /**
  *  define alias type name
  */
-func (this *BeanCtxBinder) alias(aliasType string, dstType reflect.Type) {
-	this.aliasNameMapping[aliasType] = dstType
+func (myself *BeanCtxBinder) alias(aliasType string, dstType reflect.Type) {
+	myself.aliasNameMapping[aliasType] = dstType
 }
 
-func (this *BeanCtxBinder) bindProxyInst(proxyBean *proxyObject, refType reflect.Type) {
-	this.bindBeans[refType] = proxyBean
+func (myself *BeanCtxBinder) bindProxyInst(proxyBean *proxyObject, refType reflect.Type) {
+	myself.bindBeans[refType] = proxyBean
 }
 
 // -------------------- bind context -------------
 /**
  * bind function inteface with reflect type
  */
-func (this *BeanCtxBinder) bind(newBindingKeyFunc func(reflect.Type) bindingKey, from []interface{}) InterfaceBuilder {
+func (myself *BeanCtxBinder) bind(newBindingKeyFunc func(reflect.Type) bindingKey, from []interface{}) InterfaceBuilder {
 
 	lenFrom := len(from)
 	if lenFrom == 0 {
-		this.addBindingError(errNil)
+		myself.addBindingError(errNil)
 		return newNoOpBuilder()
 	}
 
@@ -49,7 +50,7 @@ func (this *BeanCtxBinder) bind(newBindingKeyFunc func(reflect.Type) bindingKey,
 		fromReflectType := reflect.TypeOf(from[i])
 
 		if fromReflectType == nil {
-			this.addBindingError(errNil)
+			myself.addBindingError(errNil)
 			return newNoOpBuilder()
 		}
 
@@ -59,27 +60,25 @@ func (this *BeanCtxBinder) bind(newBindingKeyFunc func(reflect.Type) bindingKey,
 		bindingKeys[i] = newBindingKeyFunc(fromOrgType)
 	}
 
-	return newBuilder(this, bindingKeys)
+	return newBuilder(myself, bindingKeys)
 }
 
-func (binderCtx *BeanCtxBinder) addBindingError(err error) {
-	binderCtx.bindingErrors = append(binderCtx.bindingErrors, err)
+func (myself *BeanCtxBinder) addBindingError(err error) {
+	myself.bindingErrors = append(myself.bindingErrors, err)
 }
 
-/**
- * bind type in builder
- */
-func (this *BeanCtxBinder) BindType(froms ...interface{}) Builder {
+// BindType bind type in builder
+func (myself *BeanCtxBinder) BindType(froms ...interface{}) Builder {
 
 	// ---- create builder ----
-	return this.bind(newBindingKey, froms)
+	return myself.bind(newBindingKey, froms)
 }
 
 /**
  * defined method binding
  * implement function for inject api
  */
-func (this *BeanCtxBinder) String() string {
+func (myself *BeanCtxBinder) String() string {
 	return fmt.Sprintf("beanCtx{%s}", "update content ")
 }
 
@@ -94,11 +93,11 @@ func createBeanCtxBinder() *BeanCtxBinder {
 /**
  * set binding
  */
-func (this *BeanCtxBinder) setBinding(bindingKey bindingKey, binding binding) {
-	foundBinding, ok := this.bindings[bindingKey]
+func (myself *BeanCtxBinder) setBinding(bindingKey bindingKey, binding binding) {
+	foundBinding, ok := myself.bindings[bindingKey]
 	if ok {
-		this.addBindingError(errAlreadyBound.withTag("bindingKey", bindingKey).withTag("foundBinding", foundBinding))
+		myself.addBindingError(errAlreadyBound.withTag("bindingKey", bindingKey).withTag("foundBinding", foundBinding))
 		return
 	}
-	this.bindings[bindingKey] = binding
+	myself.bindings[bindingKey] = binding
 }
