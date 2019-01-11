@@ -21,6 +21,8 @@ func (myself *proxyObject) applyProxy(src interface{}) {
 
 	objType := reflect.TypeOf(src)
 
+	fmt.Println("hello message ")
+
 	methodMap := make(map[string]reflect.Method, 0)
 	var i int
 	for i = 0; i < objType.NumMethod(); i++ {
