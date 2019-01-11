@@ -74,7 +74,9 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 
 func (myself *register) getProxy(ref interface{}) *proxyObject {
 	proxyObj := new(proxyObject)
+
 	proxyObj.applyProxy(ref)
+
 	return proxyObj
 }
 

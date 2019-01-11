@@ -13,7 +13,9 @@ type proxyObject struct {
 	ref     interface{}
 	methods map[string]reflect.Method
 
-	injectMethod map[string]reflect.Method
+	injectMethods map[string]reflect.Method
+
+	aftersetMethod reflect.Method
 }
 
 // apply proxy to self
@@ -21,15 +23,26 @@ func (myself *proxyObject) applyProxy(src interface{}) {
 
 	objType := reflect.TypeOf(src)
 
-	fmt.Println("hello message ")
-
 	methodMap := make(map[string]reflect.Method, 0)
+	injectMap := make(map[string]reflect.Method, 0)
+
 	var i int
 	for i = 0; i < objType.NumMethod(); i++ {
 		m := objType.Method(i)
 		methodMap[m.Name] = m
+
+		// --- check method with prefix "Inject" ---
+		if strings.HasPrefix(m.Name, "Inject") {
+			injectMap[m.Name] = m
+		}
+
+		if strings.Compare(m.Name, "Afterset") == 0 {
+			myself.aftersetMethod = m
+		}
+
 	}
 	myself.methods = methodMap
+	myself.injectMethods = injectMap
 
 	// --- define bean ---
 	myself.ref = src

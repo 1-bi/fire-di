@@ -40,3 +40,10 @@ func (this *Case3MockObj3) Inject(obj *Case3MockObj2) {
 func (this *Case3MockObj3) SayHello() {
 	fmt.Println("case 3 mock object 3 ")
 }
+
+/**
+ * define after method
+ */
+func (this *Case3MockObj3) Afterset() {
+
+}
