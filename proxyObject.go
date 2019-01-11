@@ -16,6 +16,8 @@ type proxyObject struct {
 	injectMethods map[string]reflect.Method
 
 	aftersetMethod reflect.Method
+
+	dependentStructs []string
 }
 
 // apply proxy to self
@@ -33,6 +35,12 @@ func (myself *proxyObject) applyProxy(src interface{}) {
 
 		// --- check method with prefix "Inject" ---
 		if strings.HasPrefix(m.Name, "Inject") {
+
+			// found object dependency
+			myself.foundDependencyCls(m)
+
+			fmt.Println(myself.dependentStructs)
+
 			injectMap[m.Name] = m
 		}
 
@@ -46,6 +54,34 @@ func (myself *proxyObject) applyProxy(src interface{}) {
 
 	// --- define bean ---
 	myself.ref = src
+
+}
+
+func (myself *proxyObject) foundDependencyCls(injectMethod reflect.Method) {
+
+	methodTyp := injectMethod.Type
+	var i int
+	var existedDependency bool
+	for i = 0; i < methodTyp.NumIn(); i++ {
+		objectTyp := methodTyp.In(i)
+		if objectTyp.Kind() == reflect.Ptr {
+
+			// --- check the dependency ---
+			existedDependency = false
+			for _, v := range myself.dependentStructs {
+
+				if v == objectTyp.String() {
+					existedDependency = true
+				}
+
+			}
+
+			if !existedDependency {
+				myself.dependentStructs = append(myself.dependentStructs, objectTyp.String())
+			}
+
+		}
+	}
 
 }
 
