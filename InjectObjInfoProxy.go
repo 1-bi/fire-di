@@ -9,19 +9,17 @@ import (
 /**
  * defin all project object interface
  */
-type proxyObject struct {
+type InjectObjInfoProxy struct {
 	ref     interface{}
 	methods map[string]reflect.Method
 
-	injectMethods map[string]reflect.Method
-
-	aftersetMethod reflect.Method
-
+	injectMethods    map[string]reflect.Method
+	aftersetMethod   reflect.Method
 	dependentStructs []string
 }
 
 // apply proxy to self
-func (myself *proxyObject) applyProxy(src interface{}) {
+func (myself *InjectObjInfoProxy) applyProxy(src interface{}) {
 
 	objType := reflect.TypeOf(src)
 
@@ -55,7 +53,7 @@ func (myself *proxyObject) applyProxy(src interface{}) {
 
 }
 
-func (myself *proxyObject) foundDependencyCls(injectMethod reflect.Method, ownerObjTyp reflect.Type) {
+func (myself *InjectObjInfoProxy) foundDependencyCls(injectMethod reflect.Method, ownerObjTyp reflect.Type) {
 
 	methodTyp := injectMethod.Type
 	var i int
@@ -86,6 +84,10 @@ func (myself *proxyObject) foundDependencyCls(injectMethod reflect.Method, owner
 		}
 	}
 
+}
+
+func (myself *InjectObjInfoProxy) GetAllDependency() []string {
+	return myself.dependentStructs
 }
 
 type proxyInjectObject struct {

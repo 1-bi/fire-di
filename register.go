@@ -15,7 +15,24 @@ type RegisterBean struct {
 }
 
 /**
- * beanCtx for beanCtx
+ * create new beanCtx implement
+ */
+func newRegister() *register {
+	register := new(register)
+	register.bindingErrors = make([]error, 0)
+	register.beanFuns = make(map[string]interface{})
+	register.bindingFuns = make(map[string]interface{})
+	register.bindingType = make(map[reflect.Type]reflect.Type)
+	register.invokedFuns = make([]interface{}, 0)
+	register.loginst = nil
+
+	register.proxyBeans = make([]*InjectObjInfoProxy, 0)
+
+	return register
+}
+
+/**
+ * bean register for bindding mapping --
  */
 type register struct {
 	bindingErrors []error
@@ -24,6 +41,8 @@ type register struct {
 	bindingType   map[reflect.Type]reflect.Type
 	invokedFuns   []interface{}
 	beanFuns      map[string]interface{}
+	// define proxy bean dependency
+	proxyBeans []*InjectObjInfoProxy
 }
 
 /**
@@ -70,10 +89,18 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 		}
 	}
 
+	// --- append the proxy bean ---
+	myself.proxyBeans = append(myself.proxyBeans, proxyBean)
+
 }
 
-func (myself *register) getProxy(ref interface{}) *proxyObject {
-	proxyObj := new(proxyObject)
+// GetProxyBeans get the proxy beans reference
+func (myself *register) GetProxyBeans() []*InjectObjInfoProxy {
+	return myself.proxyBeans
+}
+
+func (myself *register) getProxy(ref interface{}) *InjectObjInfoProxy {
+	proxyObj := new(InjectObjInfoProxy)
 	proxyObj.dependentStructs = make([]string, 0)
 
 	proxyObj.applyProxy(ref)
@@ -108,14 +135,4 @@ func (myself *register) Invoke(handlers ...interface{}) error {
  */
 func (myself *register) String() string {
 	return fmt.Sprintf("beanCtx{%s}", "update content ")
-}
-
-/**
- * create new beanCtx implement
- */
-func createProvider() *register {
-	return &register{make([]error, 0),
-		nil, make(map[string]interface{}), make(map[reflect.Type]reflect.Type),
-		make([]interface{}, 0), make(map[string]interface{}),
-	}
 }

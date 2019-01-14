@@ -49,6 +49,10 @@ func createInjector(bs providerstore) (*injector, error) {
 		}
 	}
 
+	// ---- get all injector object dependency mapping ---
+
+	injector.foundProxyBeanDependency(bs.modContext.GetRegister().GetProxyBeans())
+
 	if err != nil {
 		return injector, err
 	}
@@ -56,10 +60,34 @@ func createInjector(bs providerstore) (*injector, error) {
 	return injector, err
 }
 
+func (myself *injector) foundProxyBeanDependency(proxyBeans []*InjectObjInfoProxy) map[string][]*dependencyState {
+
+	proxyDependencyStats := make(map[string][]*dependencyState, 0)
+
+	for _, proxyBean := range proxyBeans {
+
+		typName := reflect.TypeOf(proxyBean.ref)
+
+		dependencyStateArray := make([]*dependencyState, 0)
+
+		for _, dependency := range proxyBean.dependentStructs {
+
+			dependencyStateArray = append(dependencyStateArray, newDependencyState(dependency))
+		}
+
+		if len(dependencyStateArray) > 0 {
+			proxyDependencyStats[typName.String()] = dependencyStateArray
+		}
+	}
+
+	return proxyDependencyStats
+
+}
+
 /**
  * define proxy message
  */
-func (i *injector) scanProxyInject(proxies map[string]*proxyObject) error {
+func (i *injector) scanProxyInject(proxies map[string]*InjectObjInfoProxy) error {
 
 	for proxyName, proxyRef := range proxies {
 
