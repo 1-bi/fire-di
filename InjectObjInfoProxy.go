@@ -31,12 +31,20 @@ func (myself *InjectObjInfoProxy) applyProxy(src interface{}) {
 		m := objType.Method(i)
 		methodMap[m.Name] = m
 
-		// --- check method with prefix "Inject" ---
-		if strings.HasPrefix(m.Name, "Inject") {
+		var matchPrefix bool
 
-			// found object dependency
+		// --- check the use define prefix method prefix ---
+		for _, prefix := range runnimeConf.injectMethodPrefix {
+
+			if strings.HasPrefix(m.Name, prefix) {
+				matchPrefix = true
+				break
+			}
+		}
+
+		if matchPrefix {
+			// ---- invoke method bean ---
 			myself.foundDependencyCls(m, objType)
-
 			injectMap[m.Name] = m
 		}
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gitlab.com/1-bi/log-api/loggercom"
 	"reflect"
-	"strings"
 )
 
 // RegisterBean define register bean
@@ -67,30 +66,31 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 	fn := funcNameProvide(registerBean)
 	myself.bindingFuns[fn] = proxyHandler
 
-	// --- check function with prefix "Inject" ---
-
-	for methodName, m := range proxyBean.methods {
-
-		var matchPrefix bool
-
-		// --- check the use define prefix method prefix ---
-		for _, prefix := range runnimeConf.injectMethodPrefix {
-
-			if !strings.HasPrefix(methodName, prefix) {
-				matchPrefix = true
-				break
-			}
-		}
-
-		if matchPrefix {
-			// ---- invoke method bean ---
-			myself.Invoke(m.Func.Interface())
-
-		}
-	}
-
 	// --- append the proxy bean ---
 	myself.proxyBeans = append(myself.proxyBeans, proxyBean)
+
+	// --- check function with prefix "Inject" ---
+	/*
+
+		for methodName, m := range proxyBean.methods {
+
+			var matchPrefix bool
+
+			// --- check the use define prefix method prefix ---
+			for _, prefix := range runnimeConf.injectMethodPrefix {
+
+				if !strings.HasPrefix(methodName, prefix) {
+					matchPrefix = true
+					break
+				}
+			}
+
+			if matchPrefix {
+				// ---- invoke method bean ---
+				myself.Invoke(m.Func.Interface())
+
+			}
+		}*/
 
 }
 
@@ -102,9 +102,7 @@ func (myself *register) GetProxyBeans() []*InjectObjInfoProxy {
 func (myself *register) getProxy(ref interface{}) *InjectObjInfoProxy {
 	proxyObj := new(InjectObjInfoProxy)
 	proxyObj.dependentStructs = make([]string, 0)
-
 	proxyObj.applyProxy(ref)
-
 	return proxyObj
 }
 
