@@ -37,9 +37,7 @@ func (myself *proxyObject) applyProxy(src interface{}) {
 		if strings.HasPrefix(m.Name, "Inject") {
 
 			// found object dependency
-			myself.foundDependencyCls(m)
-
-			fmt.Println(myself.dependentStructs)
+			myself.foundDependencyCls(m, objType)
 
 			injectMap[m.Name] = m
 		}
@@ -57,7 +55,7 @@ func (myself *proxyObject) applyProxy(src interface{}) {
 
 }
 
-func (myself *proxyObject) foundDependencyCls(injectMethod reflect.Method) {
+func (myself *proxyObject) foundDependencyCls(injectMethod reflect.Method, ownerObjTyp reflect.Type) {
 
 	methodTyp := injectMethod.Type
 	var i int
@@ -65,6 +63,11 @@ func (myself *proxyObject) foundDependencyCls(injectMethod reflect.Method) {
 	for i = 0; i < methodTyp.NumIn(); i++ {
 		objectTyp := methodTyp.In(i)
 		if objectTyp.Kind() == reflect.Ptr {
+
+			// --- skip add dependency when the type inputed equals type object ---
+			if objectTyp == ownerObjTyp {
+				continue
+			}
 
 			// --- check the dependency ---
 			existedDependency = false
