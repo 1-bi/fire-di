@@ -53,6 +53,7 @@ func (myself *InjectObjInfoProxy) applyProxy(src interface{}) {
 
 		if strings.Compare(m.Name, "Afterset") == 0 {
 			myself.aftersetMethod = objRev.Method(i)
+
 		}
 
 	}

@@ -71,13 +71,15 @@ func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoPr
 			dependencyStateArray = append(dependencyStateArray, newDependencyState(dependency))
 		}
 
-		myself.setProxyBeanInjectFun(proxyBean, dependencyStateArray)
-
-		/**
 		if len(dependencyStateArray) > 0 {
 
+			myself.setProxyBeanInjectFun(proxyBean, dependencyStateArray)
+
+		} else {
+			//  call after method directory
+			myself.callAftersetfun(proxyBean)
 		}
-		*/
+
 	}
 
 }
@@ -119,12 +121,7 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 
 			if allDepLoaded {
 				// --- fire after event ---
-
-				funAfter := proxyBean.aftersetMethod
-
-				if funAfter.Kind() != reflect.Invalid {
-					funAfter.Call(nil)
-				}
+				myself.callAftersetfun(proxyBean)
 			}
 
 			return []reflect.Value{}
@@ -135,6 +132,14 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 		myself.container.Invoke(resultFun.Interface())
 	}
 
+}
+
+func (myself *injector) callAftersetfun(proxyBean *InjectObjInfoProxy) {
+	funAfter := proxyBean.aftersetMethod
+
+	if funAfter.Kind() != reflect.Invalid {
+		funAfter.Call(nil)
+	}
 }
 
 /**

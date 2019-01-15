@@ -28,7 +28,7 @@ func (this *Case3MockObj2) SayHello() {
 }
 
 func (this *Case3MockObj2) Afterset() {
-	fmt.Println("after case 3 mock object 2 ")
+	fmt.Println("afterset case 3 mock object 2 ")
 }
 
 type Case3MockObj3 struct {
