@@ -62,14 +62,6 @@ func createInjector(bs providerstore) (*injector, error) {
 
 func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoProxy) {
 
-	proxyInvokeProvided := func(fptr interface{}) {
-		fn := reflect.ValueOf(fptr).Elem()
-		fn.Set(reflect.MakeFunc(fn.Type(), func(in []reflect.Value) []reflect.Value {
-			//obj := reflect.ValueOf(registerBean.Bean)
-			return []reflect.Value{obj}
-		}))
-	}
-
 	for _, proxyBean := range proxyBeans {
 
 		dependencyStateArray := make([]*dependencyState, 0)
@@ -79,7 +71,7 @@ func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoPr
 			dependencyStateArray = append(dependencyStateArray, newDependencyState(dependency))
 		}
 
-		myself.setProxyBeanInjectFun(proxyBean, dependencyStateArray, proxyInvokeProvided)
+		myself.setProxyBeanInjectFun(proxyBean, dependencyStateArray)
 
 		/**
 		if len(dependencyStateArray) > 0 {
@@ -90,14 +82,57 @@ func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoPr
 
 }
 
-func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, depMethos []*dependencyState, provFun func(fptr interface{})) {
+func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, depenMethods []*dependencyState) {
 
-	for mName, method := range proxyBean.injectMethods {
+	for _, methodRef := range proxyBean.injectMethods {
 
-		fmt.Println(mName)
+		refTarFun := reflect.New(methodRef.Type())
+		fn := refTarFun.Interface()
 
-		fmt.Println(method)
+		// ---- set the value ---
+		resultFun := FuncInterceptor(fn, func(in []reflect.Value) []reflect.Value {
 
+			// --- defined depenMethods status ---
+
+			for _, state := range depenMethods {
+
+				for _, inCls := range in {
+
+					if state.stateInjected == 0 && inCls.Type().String() == state.dependencyType {
+						state.updateState(1)
+						break
+					}
+				}
+
+			}
+
+			// --- check all dependency class is load ---
+			var allDepLoaded bool
+			allDepLoaded = true
+			for _, state := range depenMethods {
+				// check dependency load or not
+				if state.stateInjected == 0 {
+					allDepLoaded = false
+					break
+				}
+			}
+
+			if allDepLoaded {
+				// --- fire after event ---
+
+				funAfter := proxyBean.aftersetMethod
+
+				if funAfter.Kind() != reflect.Invalid {
+					funAfter.Call(nil)
+				}
+			}
+
+			return []reflect.Value{}
+		})
+
+		fmt.Println(resultFun.Type())
+
+		myself.container.Invoke(resultFun.Interface())
 	}
 
 }

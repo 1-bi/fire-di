@@ -13,8 +13,9 @@ type InjectObjInfoProxy struct {
 	ref     interface{}
 	methods map[string]reflect.Method
 
-	injectMethods    map[string]reflect.Method
-	aftersetMethod   reflect.Method
+	injectMethods map[reflect.Method]reflect.Value
+	// after set method define
+	aftersetMethod   reflect.Value
 	dependentStructs []string
 }
 
@@ -22,9 +23,10 @@ type InjectObjInfoProxy struct {
 func (myself *InjectObjInfoProxy) applyProxy(src interface{}) {
 
 	objType := reflect.TypeOf(src)
+	objRev := reflect.ValueOf(src)
 
 	methodMap := make(map[string]reflect.Method, 0)
-	injectMap := make(map[string]reflect.Method, 0)
+	injectMap := make(map[reflect.Method]reflect.Value, 0)
 
 	var i int
 	for i = 0; i < objType.NumMethod(); i++ {
@@ -45,11 +47,12 @@ func (myself *InjectObjInfoProxy) applyProxy(src interface{}) {
 		if matchPrefix {
 			// ---- invoke method bean ---
 			myself.foundDependencyCls(m, objType)
-			injectMap[m.Name] = m
+			injectMap[m] = objRev.Method(i)
+
 		}
 
 		if strings.Compare(m.Name, "Afterset") == 0 {
-			myself.aftersetMethod = m
+			myself.aftersetMethod = objRev.Method(i)
 		}
 
 	}

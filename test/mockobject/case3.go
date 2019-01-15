@@ -12,7 +12,7 @@ func (this *Case3MockObj1) SayHello() {
 /**
  * @Inject inject object
  */
-func (this *Case3MockObj1) Inject(co *Case3MockObj2, c3 *Case3MockObj3) {
+func (this *Case3MockObj1) InjectMockObj(co *Case3MockObj2, c3 *Case3MockObj3) {
 	fmt.Println("  inject new object ")
 	fmt.Println(co)
 	co.SayHello()
@@ -25,6 +25,10 @@ type Case3MockObj2 struct {
 
 func (this *Case3MockObj2) SayHello() {
 	fmt.Println("case 3 mock object 2 ")
+}
+
+func (this *Case3MockObj2) Afterset() {
+	fmt.Println("after case 3 mock object 2 ")
 }
 
 type Case3MockObj3 struct {
@@ -45,5 +49,6 @@ func (this *Case3MockObj3) SayHello() {
  * define after method
  */
 func (this *Case3MockObj3) Afterset() {
+	fmt.Println("call after set in case mock obj3")
 
 }

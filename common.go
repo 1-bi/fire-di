@@ -41,6 +41,13 @@ func funcNameProvide(regBean *RegisterBean) string {
 	return funcName
 }
 
+// FuncInterceptor define interceptor function handle
+func FuncInterceptor(fptr interface{}, funIntercept func(in []reflect.Value) []reflect.Value) reflect.Value {
+	fn := reflect.ValueOf(fptr).Elem()
+	fn.Set(reflect.MakeFunc(fn.Type(), funIntercept))
+	return fn
+}
+
 // whitelisting types to make sure the framework works
 func isSupportedBindingKeyReflectType(reflectType reflect.Type) bool {
 	return isSupportedBindReflectType(reflectType) || isSupportedBindInterfaceReflectType(reflectType) || isSupportedBindConstantReflectType(reflectType)

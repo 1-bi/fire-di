@@ -52,15 +52,11 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 	// --- create new function ---
 	proxyBean := myself.getProxy(registerBean.Bean)
 
-	proxyProvided := func(fptr interface{}) {
-		fn := reflect.ValueOf(fptr).Elem()
-		fn.Set(reflect.MakeFunc(fn.Type(), func(in []reflect.Value) []reflect.Value {
-			obj := reflect.ValueOf(registerBean.Bean)
-			return []reflect.Value{obj}
-		}))
-	}
+	FuncInterceptor(registerBean.ProvideFun, func(in []reflect.Value) []reflect.Value {
+		obj := reflect.ValueOf(registerBean.Bean)
+		return []reflect.Value{obj}
+	})
 
-	proxyProvided(registerBean.ProvideFun)
 	proxyHandler := reflect.ValueOf(registerBean.ProvideFun).Elem().Interface()
 
 	fn := funcNameProvide(registerBean)
@@ -70,27 +66,6 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 	myself.proxyBeans = append(myself.proxyBeans, proxyBean)
 
 	// --- check function with prefix "Inject" ---
-	/*
-
-		for methodName, m := range proxyBean.methods {
-
-			var matchPrefix bool
-
-			// --- check the use define prefix method prefix ---
-			for _, prefix := range runnimeConf.injectMethodPrefix {
-
-				if !strings.HasPrefix(methodName, prefix) {
-					matchPrefix = true
-					break
-				}
-			}
-
-			if matchPrefix {
-				// ---- invoke method bean ---
-				myself.Invoke(m.Func.Interface())
-
-			}
-		}*/
 
 }
 
