@@ -72,6 +72,11 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 // RegFunc set the function for register function
 func (myself *register) RegFunc(fn interface{}) {
 
+	// --- defined function mapping ---
+	fnPrt := reflect.ValueOf(fn)
+
+	fmt.Println(fnPrt)
+
 }
 
 // GetProxyBeans get the proxy beans reference
