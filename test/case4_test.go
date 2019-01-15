@@ -37,6 +37,6 @@ func TestDI_module_case04(t *testing.T) {
 
 }
 
-func bootstrapCase4(helper *mockobject.Case3MockObj1) {
+func bootstrapCase4(helper *mockobject.Case4MockObj1) {
 	helper.SayHello()
 }

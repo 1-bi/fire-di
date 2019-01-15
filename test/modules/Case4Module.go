@@ -21,7 +21,10 @@ func (this *Case4Module) Bind(ctx di.ModuleContext) {
  */
 func (this *Case4Module) provideCase3Obj1(mock *mockobject.Case4MockObj2) *mockobject.Case4MockObj1 {
 
-	return nil
+	mockObj := new(mockobject.Case4MockObj1)
+	mockObj.InjectMockObj(mock)
+
+	return mockObj
 }
 
 func (this *Case4Module) provideCase4Obj2() *di.RegisterBean {
