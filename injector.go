@@ -127,8 +127,6 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 			return []reflect.Value{}
 		})
 
-		fmt.Println(resultFun.Type())
-
 		myself.container.Invoke(resultFun.Interface())
 	}
 

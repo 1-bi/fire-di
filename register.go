@@ -75,7 +75,17 @@ func (myself *register) RegFunc(fn interface{}) {
 	// --- defined function mapping ---
 	fnPrt := reflect.ValueOf(fn)
 
-	fmt.Println(fnPrt)
+	newFunType := reflect.New(fnPrt.Type())
+
+	resultFun := FuncInterceptor(newFunType.Interface(), func(in []reflect.Value) []reflect.Value {
+
+		// --- defined depenMethods status ---
+		fmt.Println("0k test")
+
+		return []reflect.Value{}
+	})
+
+	// define object ---
 
 }
 

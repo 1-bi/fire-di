@@ -20,7 +20,7 @@ func TestDI_module_case04(t *testing.T) {
 	 */
 	di.Config(diConf)
 
-	module := tm.Case3Module{}
+	module := tm.Case4Module{}
 
 	// ----- register module pre defined ----
 	bs := di.RegisterModules(&module)
