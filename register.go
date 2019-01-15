@@ -69,6 +69,11 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 
 }
 
+// RegFunc set the function for register function
+func (myself *register) RegFunc(fn interface{}) {
+
+}
+
 // GetProxyBeans get the proxy beans reference
 func (myself *register) GetProxyBeans() []*InjectObjInfoProxy {
 	return myself.proxyBeans
