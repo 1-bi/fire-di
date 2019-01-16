@@ -52,13 +52,13 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 
 	// --- create new function ---
 	proxyBean := myself.getProxy(registerBean.Bean)
-
-	FuncInterceptor(registerBean.ProvideFun, func(in []reflect.Value) []reflect.Value {
+	proxyHandlerRef := FuncInterceptor(registerBean.ProvideFun, func(in []reflect.Value) []reflect.Value {
 		obj := reflect.ValueOf(registerBean.Bean)
 		return []reflect.Value{obj}
 	})
 
-	proxyHandler := reflect.ValueOf(registerBean.ProvideFun).Elem().Interface()
+	//proxyHandler := reflect.ValueOf(registerBean.ProvideFun).Elem().Interface()
+	proxyHandler := proxyHandlerRef.Interface()
 
 	fn := funcNameProvide(registerBean)
 	myself.bindingFuns[fn] = proxyHandler
