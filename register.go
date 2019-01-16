@@ -2,6 +2,7 @@ package fire_di
 
 import (
 	"fmt"
+	"github.com/1-bi/fire-di/test/mockobject"
 	"gitlab.com/1-bi/log-api/loggercom"
 	"reflect"
 )
@@ -80,12 +81,18 @@ func (myself *register) RegFunc(fn interface{}) {
 	resultFun := FuncInterceptor(newFunType.Interface(), func(in []reflect.Value) []reflect.Value {
 
 		// --- defined depenMethods status ---
-		fmt.Println("0k test")
-
-		return []reflect.Value{}
+		result := fnPrt.Call(in)
+		return result
 	})
 
 	// define object ---
+	var params = make([]reflect.Value, fnPrt.Type().NumIn())
+
+	mockObj := new(mockobject.Case4MockObj2)
+	params[0] = reflect.ValueOf(mockObj)
+
+	fName := funcName(fn)
+	myself.bindingFuns[fName] = resultFun.Interface()
 
 }
 
