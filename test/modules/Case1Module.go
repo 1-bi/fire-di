@@ -9,24 +9,24 @@ import (
 type Case1Module struct {
 }
 
-func (this *Case1Module) Bind(ctx di.ModuleContext) {
+func (myself *Case1Module) Bind(ctx di.ModuleContext) {
 
 	/**
 	 * 注册提供使用的 struct bean
 	 */
-	ctx.GetRegister().RegBean(this.provideCase1Obj1())
+	ctx.GetRegister().RegBean(myself.provideCase1Obj1())
 
 	/**
 	 * 定义提供使用的 struct bean
 	 */
-	ctx.GetRegister().Invoke(this.injectCase1)
+	ctx.GetRegister().Invoke(myself.injectCase1)
 
 }
 
 /**
  * 定义注册的bean
  */
-func (this *Case1Module) provideCase1Obj1() *di.RegisterBean {
+func (myself *Case1Module) provideCase1Obj1() *di.RegisterBean {
 
 	var pro func() *mockobject.Case1MockObj1
 	rb := new(di.RegisterBean)
@@ -39,7 +39,7 @@ func (this *Case1Module) provideCase1Obj1() *di.RegisterBean {
 /**
  * 调用函数
  */
-func (this *Case1Module) injectCase1(obj1 *mockobject.Case1MockObj1) {
+func (myself *Case1Module) injectCase1(obj1 *mockobject.Case1MockObj1) {
 	log.SetPrefix("Case1Module.injectCase1: ")
 
 	log.Print(" Start to invoke function  -> ")

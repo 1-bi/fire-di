@@ -8,17 +8,17 @@ import (
 type Case3Module struct {
 }
 
-func (this *Case3Module) Bind(ctx di.ModuleContext) {
+func (myself *Case3Module) Bind(ctx di.ModuleContext) {
 	// --- define function type , and assign provider method
-	ctx.GetRegister().RegBean(this.provideCase3Obj2())
-	ctx.GetRegister().RegBean(this.provideCase3Obj1())
-	ctx.GetRegister().RegBean(this.provideCase3Obj3())
+	ctx.GetRegister().RegBean(myself.provideCase3Obj2())
+	ctx.GetRegister().RegBean(myself.provideCase3Obj1())
+	ctx.GetRegister().RegBean(myself.provideCase3Obj3())
 }
 
 /**
  * define base the object method
  */
-func (this *Case3Module) provideCase3Obj1() *di.RegisterBean {
+func (myself *Case3Module) provideCase3Obj1() *di.RegisterBean {
 
 	var pro func() *mockobject.Case3MockObj1
 	rb := new(di.RegisterBean)
@@ -28,7 +28,7 @@ func (this *Case3Module) provideCase3Obj1() *di.RegisterBean {
 	return rb
 }
 
-func (this *Case3Module) provideCase3Obj2() *di.RegisterBean {
+func (myself *Case3Module) provideCase3Obj2() *di.RegisterBean {
 
 	var pro func(beanContextBinder *di.BeanCtxBinder) *mockobject.Case3MockObj2
 	rb := new(di.RegisterBean)
@@ -38,7 +38,7 @@ func (this *Case3Module) provideCase3Obj2() *di.RegisterBean {
 	return rb
 }
 
-func (this *Case3Module) provideCase3Obj3() *di.RegisterBean {
+func (myself *Case3Module) provideCase3Obj3() *di.RegisterBean {
 	var case3MockObj = new(mockobject.Case3MockObj3)
 
 	var pro = func(beanContextBinder *di.BeanCtxBinder) *mockobject.Case3MockObj3 {
