@@ -22,6 +22,7 @@ func funcName(fn interface{}) string {
 	return fmt.Sprintf("%s()", function)
 }
 
+// funcNameProvide provide the bean name for the function
 func funcNameProvide(regBean *RegisterBean) string {
 
 	var beanStr, funStr, funcName string
@@ -39,6 +40,13 @@ func funcNameProvide(regBean *RegisterBean) string {
 
 	funcName = strings.Join([]string{beanStr, funStr}, ":")
 	return funcName
+}
+
+// FuncInterceptor define interceptor function handle
+func FuncInterceptor(fptr interface{}, funIntercept func(in []reflect.Value) []reflect.Value) reflect.Value {
+	fn := reflect.ValueOf(fptr).Elem()
+	fn.Set(reflect.MakeFunc(fn.Type(), funIntercept))
+	return fn
 }
 
 // whitelisting types to make sure the framework works

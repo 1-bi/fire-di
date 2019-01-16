@@ -20,7 +20,7 @@ func (myself *BaseModuleContext) GetRegister() *register {
 func registerModules(mods []Module) BaseModuleContext {
 
 	// --- create new beanCtx  ----
-	provider := createProvider()
+	provider := newRegister()
 
 	// --- bind common logger ----
 	log := loggerzap.GetLogger()
@@ -37,10 +37,8 @@ func registerModules(mods []Module) BaseModuleContext {
 	/**
 	 * define module interface
 	 */
-
 	for _, mod := range mods {
 		// --- use and call function beanCtx ----
-
 		mod.Bind(&modCtx)
 	}
 

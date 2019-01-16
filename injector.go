@@ -49,6 +49,10 @@ func createInjector(bs providerstore) (*injector, error) {
 		}
 	}
 
+	// ---- get all injector object dependency mapping ---
+
+	injector.proxyBeanInvokedFunDefined(bs.modContext.GetRegister().GetProxyBeans())
+
 	if err != nil {
 		return injector, err
 	}
@@ -56,10 +60,90 @@ func createInjector(bs providerstore) (*injector, error) {
 	return injector, err
 }
 
+func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoProxy) {
+
+	for _, proxyBean := range proxyBeans {
+
+		dependencyStateArray := make([]*dependencyState, 0)
+
+		for _, dependency := range proxyBean.dependentStructs {
+
+			dependencyStateArray = append(dependencyStateArray, newDependencyState(dependency))
+		}
+
+		if len(dependencyStateArray) > 0 {
+
+			myself.setProxyBeanInjectFun(proxyBean, dependencyStateArray)
+
+		} else {
+			//  call after method directory
+			myself.callAftersetfun(proxyBean)
+		}
+
+	}
+
+}
+
+func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, depenMethods []*dependencyState) {
+
+	for _, methodRef := range proxyBean.injectMethods {
+
+		refTarFun := reflect.New(methodRef.Type())
+		fn := refTarFun.Interface()
+
+		// ---- set the value ---
+		resultFun := FuncInterceptor(fn, func(in []reflect.Value) []reflect.Value {
+
+			// --- defined depenMethods status ---
+
+			for _, state := range depenMethods {
+
+				for _, inCls := range in {
+
+					if state.stateInjected == 0 && inCls.Type().String() == state.dependencyType {
+						state.updateState(1)
+						break
+					}
+				}
+
+			}
+
+			// --- check all dependency class is load ---
+			var allDepLoaded bool
+			allDepLoaded = true
+			for _, state := range depenMethods {
+				// check dependency load or not
+				if state.stateInjected == 0 {
+					allDepLoaded = false
+					break
+				}
+			}
+
+			if allDepLoaded {
+				// --- fire after event ---
+				myself.callAftersetfun(proxyBean)
+			}
+
+			return []reflect.Value{}
+		})
+
+		myself.container.Invoke(resultFun.Interface())
+	}
+
+}
+
+func (myself *injector) callAftersetfun(proxyBean *InjectObjInfoProxy) {
+	funAfter := proxyBean.aftersetMethod
+
+	if funAfter.Kind() != reflect.Invalid {
+		funAfter.Call(nil)
+	}
+}
+
 /**
  * define proxy message
  */
-func (i *injector) scanProxyInject(proxies map[string]*proxyObject) error {
+func (i *injector) scanProxyInject(proxies map[string]*InjectObjInfoProxy) error {
 
 	for proxyName, proxyRef := range proxies {
 

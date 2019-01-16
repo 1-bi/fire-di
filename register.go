@@ -2,9 +2,9 @@ package fire_di
 
 import (
 	"fmt"
+	"github.com/1-bi/fire-di/test/mockobject"
 	"gitlab.com/1-bi/log-api/loggercom"
 	"reflect"
-	"strings"
 )
 
 // RegisterBean define register bean
@@ -15,7 +15,24 @@ type RegisterBean struct {
 }
 
 /**
- * beanCtx for beanCtx
+ * create new beanCtx implement
+ */
+func newRegister() *register {
+	register := new(register)
+	register.bindingErrors = make([]error, 0)
+	register.beanFuns = make(map[string]interface{})
+	register.bindingFuns = make(map[string]interface{})
+	register.bindingType = make(map[reflect.Type]reflect.Type)
+	register.invokedFuns = make([]interface{}, 0)
+	register.loginst = nil
+
+	register.proxyBeans = make([]*InjectObjInfoProxy, 0)
+
+	return register
+}
+
+/**
+ * bean register for bindding mapping --
  */
 type register struct {
 	bindingErrors []error
@@ -24,6 +41,8 @@ type register struct {
 	bindingType   map[reflect.Type]reflect.Type
 	invokedFuns   []interface{}
 	beanFuns      map[string]interface{}
+	// define proxy bean dependency
+	proxyBeans []*InjectObjInfoProxy
 }
 
 /**
@@ -34,46 +53,57 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 	// --- create new function ---
 	proxyBean := myself.getProxy(registerBean.Bean)
 
-	proxyProvided := func(fptr interface{}) {
-		fn := reflect.ValueOf(fptr).Elem()
-		fn.Set(reflect.MakeFunc(fn.Type(), func(in []reflect.Value) []reflect.Value {
-			obj := reflect.ValueOf(registerBean.Bean)
-			return []reflect.Value{obj}
-		}))
-	}
+	FuncInterceptor(registerBean.ProvideFun, func(in []reflect.Value) []reflect.Value {
+		obj := reflect.ValueOf(registerBean.Bean)
+		return []reflect.Value{obj}
+	})
 
-	proxyProvided(registerBean.ProvideFun)
 	proxyHandler := reflect.ValueOf(registerBean.ProvideFun).Elem().Interface()
 
 	fn := funcNameProvide(registerBean)
 	myself.bindingFuns[fn] = proxyHandler
 
+	// --- append the proxy bean ---
+	myself.proxyBeans = append(myself.proxyBeans, proxyBean)
+
 	// --- check function with prefix "Inject" ---
-
-	for methodName, m := range proxyBean.methods {
-
-		var matchPrefix bool
-
-		// --- check the use define prefix method prefix ---
-		for _, prefix := range runnimeConf.injectMethodPrefix {
-
-			if !strings.HasPrefix(methodName, prefix) {
-				matchPrefix = true
-				break
-			}
-		}
-
-		if matchPrefix {
-			// ---- invoke method bean ---
-			myself.Invoke(m.Func.Interface())
-
-		}
-	}
 
 }
 
-func (myself *register) getProxy(ref interface{}) *proxyObject {
-	proxyObj := new(proxyObject)
+// RegFunc set the function for register function
+func (myself *register) RegFunc(fn interface{}) {
+
+	// --- defined function mapping ---
+	fnPrt := reflect.ValueOf(fn)
+
+	newFunType := reflect.New(fnPrt.Type())
+
+	resultFun := FuncInterceptor(newFunType.Interface(), func(in []reflect.Value) []reflect.Value {
+
+		// --- defined depenMethods status ---
+		result := fnPrt.Call(in)
+		return result
+	})
+
+	// define object ---
+	var params = make([]reflect.Value, fnPrt.Type().NumIn())
+
+	mockObj := new(mockobject.Case4MockObj2)
+	params[0] = reflect.ValueOf(mockObj)
+
+	fName := funcName(fn)
+	myself.bindingFuns[fName] = resultFun.Interface()
+
+}
+
+// GetProxyBeans get the proxy beans reference
+func (myself *register) GetProxyBeans() []*InjectObjInfoProxy {
+	return myself.proxyBeans
+}
+
+func (myself *register) getProxy(ref interface{}) *InjectObjInfoProxy {
+	proxyObj := new(InjectObjInfoProxy)
+	proxyObj.dependentStructs = make([]string, 0)
 	proxyObj.applyProxy(ref)
 	return proxyObj
 }
@@ -105,14 +135,4 @@ func (myself *register) Invoke(handlers ...interface{}) error {
  */
 func (myself *register) String() string {
 	return fmt.Sprintf("beanCtx{%s}", "update content ")
-}
-
-/**
- * create new beanCtx implement
- */
-func createProvider() *register {
-	return &register{make([]error, 0),
-		nil, make(map[string]interface{}), make(map[reflect.Type]reflect.Type),
-		make([]interface{}, 0), make(map[string]interface{}),
-	}
 }
