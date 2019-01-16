@@ -22,6 +22,7 @@ func funcName(fn interface{}) string {
 	return fmt.Sprintf("%s()", function)
 }
 
+// funcNameProvide provide the bean name for the function
 func funcNameProvide(regBean *RegisterBean) string {
 
 	var beanStr, funStr, funcName string
