@@ -31,7 +31,7 @@ func (myself *Case2Module) provideCase2Obj1() *di.RegisterBean {
 
 func (myself *Case2Module) provideCase2Obj2() *di.RegisterBean {
 
-	var pro func() *mockobject.Case2MockObj2
+	var pro func() mockobject.MockInterface
 	rb := new(di.RegisterBean)
 	rb.Bean = &mockobject.Case2MockObj2{}
 	rb.ProvideFun = &pro
@@ -49,6 +49,8 @@ func (myself *Case2Module) provideCase2Obj3() *di.RegisterBean {
 	return rb
 }
 
-func (myself *Case2Module) injectCase2(obj1 *mockobject.Case2MockObj1, obj2 *mockobject.Case2MockObj2, obj3 *mockobject.Case2MockObj3) {
+func (myself *Case2Module) injectCase2(obj1 *mockobject.Case2MockObj1, obj2 mockobject.MockInterface, obj3 *mockobject.Case2MockObj3) {
 	fmt.Println("hello message")
+
+	obj2.TestMock()
 }

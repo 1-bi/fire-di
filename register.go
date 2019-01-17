@@ -1,9 +1,11 @@
 package fire_di
 
 import (
+	"errors"
 	"fmt"
 	"github.com/1-bi/fire-di/test/mockobject"
 	"gitlab.com/1-bi/log-api/loggercom"
+	"log"
 	"reflect"
 )
 
@@ -45,6 +47,33 @@ type register struct {
 	proxyBeans []*InjectObjInfoProxy
 }
 
+func (myself *register) convertToResultObject(registerBean *RegisterBean) (reflect.Value, error) {
+	beanVal := reflect.ValueOf(registerBean.Bean)
+	funVal := reflect.ValueOf(registerBean.ProvideFun)
+	funTyp := funVal.Type().Elem()
+
+	var outputObj reflect.Value
+
+	if funTyp.NumOut() != 1 {
+		return outputObj, errors.New("The number of return object is not equal to 1 . ")
+	}
+
+	returnOutTyp := funTyp.Out(0)
+
+	if returnOutTyp.Kind() == reflect.Interface {
+
+		if beanVal.Type().Implements(returnOutTyp) {
+			outputObj = beanVal.Convert(returnOutTyp)
+
+		}
+	} else if returnOutTyp.Kind() == reflect.Ptr {
+		outputObj = beanVal
+	}
+
+	return outputObj, nil
+
+}
+
 /**
  * register bean with the way "RegisterBean"
  */
@@ -52,12 +81,18 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 
 	// --- create new function ---
 	proxyBean := myself.getProxy(registerBean.Bean)
+
+	outputObj, err := myself.convertToResultObject(registerBean)
+
+	if err != nil {
+		log.Println(err)
+	}
+
 	proxyHandlerRef := FuncInterceptor(registerBean.ProvideFun, func(in []reflect.Value) []reflect.Value {
-		obj := reflect.ValueOf(registerBean.Bean)
-		return []reflect.Value{obj}
+
+		return []reflect.Value{outputObj}
 	})
 
-	//proxyHandler := reflect.ValueOf(registerBean.ProvideFun).Elem().Interface()
 	proxyHandler := proxyHandlerRef.Interface()
 
 	fn := funcNameProvide(registerBean)

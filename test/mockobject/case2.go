@@ -16,6 +16,12 @@ func (myself *Case2MockObj2) SayHello() {
 	fmt.Println("case 2 mock object 2 ")
 }
 
+func (myself *Case2MockObj2) TestMock() {
+
+	fmt.Println(" test mock interface ")
+
+}
+
 type Case2MockObj3 struct {
 }
 
