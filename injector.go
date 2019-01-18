@@ -93,9 +93,10 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 
 		// ---- set the value ---
 		resultFun := FuncInterceptor(fn, func(in []reflect.Value) []reflect.Value {
+			// call object
+			result := methodRef.Call(in)
 
 			// --- defined depenMethods status ---
-
 			for _, state := range depenMethods {
 
 				for _, inCls := range in {
@@ -124,7 +125,7 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 				myself.callAftersetfun(proxyBean)
 			}
 
-			return []reflect.Value{}
+			return result
 		})
 
 		myself.container.Invoke(resultFun.Interface())
