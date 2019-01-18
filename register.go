@@ -3,10 +3,10 @@ package fire_di
 import (
 	"errors"
 	"fmt"
-	"github.com/1-bi/fire-di/test/mockobject"
 	"gitlab.com/1-bi/log-api/loggercom"
 	"log"
 	"reflect"
+	"strings"
 )
 
 // RegisterBean define register bean
@@ -68,7 +68,15 @@ func (myself *register) convertToResultObject(registerBean *RegisterBean) (refle
 	} else if returnOutTyp.Kind() == reflect.Ptr {
 		outputObj = beanVal
 	} else if returnOutTyp.Kind() == reflect.Struct {
-		outputObj = beanVal.Elem()
+
+		instTyp := beanVal.Type().String()
+		retoutTyp := returnOutTyp.String()
+
+		if strings.HasSuffix(instTyp, retoutTyp) {
+			outputObj = beanVal.Elem()
+		} else {
+			return outputObj, errors.New("Implement \"" + beanVal.Type().String() + "\" is not match struct \"" + returnOutTyp.String() + "\"")
+		}
 	}
 
 	return outputObj, nil
@@ -118,14 +126,17 @@ func (myself *register) RegFunc(fn interface{}) {
 
 		// --- defined depenMethods status ---
 		result := fnPrt.Call(in)
+
 		return result
 	})
 
 	// define object ---
-	var params = make([]reflect.Value, fnPrt.Type().NumIn())
+	/*
+		var params = make([]reflect.Value, fnPrt.Type().NumIn())
 
-	mockObj := new(mockobject.Case4MockObj2)
-	params[0] = reflect.ValueOf(mockObj)
+		mockObj := new(mockobject.Case4MockObj2)
+		params[0] = reflect.ValueOf(mockObj)
+	*/
 
 	fName := funcName(fn)
 	myself.bindingFuns[fName] = resultFun.Interface()
