@@ -7,6 +7,7 @@ import (
 	"gitlab.com/1-bi/log-api/loggercom"
 	"log"
 	"reflect"
+	"strings"
 )
 
 // RegisterBean define register bean
@@ -68,7 +69,15 @@ func (myself *register) convertToResultObject(registerBean *RegisterBean) (refle
 	} else if returnOutTyp.Kind() == reflect.Ptr {
 		outputObj = beanVal
 	} else if returnOutTyp.Kind() == reflect.Struct {
-		outputObj = beanVal.Elem()
+
+		instTyp := beanVal.Type().String()
+		retoutTyp := returnOutTyp.String()
+
+		if strings.HasSuffix(instTyp, retoutTyp) {
+			outputObj = beanVal.Elem()
+		} else {
+			return outputObj, errors.New("Implement \"" + beanVal.Type().String() + "\" is not match struct \"" + returnOutTyp.String() + "\"")
+		}
 	}
 
 	return outputObj, nil
