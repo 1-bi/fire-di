@@ -64,10 +64,11 @@ func (myself *register) convertToResultObject(registerBean *RegisterBean) (refle
 
 		if beanVal.Type().Implements(returnOutTyp) {
 			outputObj = beanVal.Convert(returnOutTyp)
-
 		}
 	} else if returnOutTyp.Kind() == reflect.Ptr {
 		outputObj = beanVal
+	} else if returnOutTyp.Kind() == reflect.Struct {
+		outputObj = beanVal.Elem()
 	}
 
 	return outputObj, nil
