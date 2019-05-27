@@ -60,9 +60,15 @@ func createInjector(bs providerstore) (*injector, error) {
 	return injector, err
 }
 
-func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoProxy) {
+func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*BeanProxy) {
 
 	for _, proxyBean := range proxyBeans {
+
+		beanInjectState := proxyBean.CreateInjectingState()
+		// inject container
+		beanInjectState.SetDigContainer(myself.container)
+
+		beanInjectState.DoWork()
 
 		dependencyStateArray := make([]*dependencyState, 0)
 
@@ -84,7 +90,7 @@ func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoPr
 
 }
 
-func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, depenMethods []*dependencyState) {
+func (myself *injector) setProxyBeanInjectFun(proxyBean *BeanProxy, depenMethods []*dependencyState) {
 
 	for _, methodRef := range proxyBean.injectMethods {
 
@@ -93,9 +99,10 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 
 		// ---- set the value ---
 		resultFun := FuncInterceptor(fn, func(in []reflect.Value) []reflect.Value {
+			// call object
+			result := methodRef.Call(in)
 
 			// --- defined depenMethods status ---
-
 			for _, state := range depenMethods {
 
 				for _, inCls := range in {
@@ -124,7 +131,7 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 				myself.callAftersetfun(proxyBean)
 			}
 
-			return []reflect.Value{}
+			return result
 		})
 
 		myself.container.Invoke(resultFun.Interface())
@@ -132,7 +139,7 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 
 }
 
-func (myself *injector) callAftersetfun(proxyBean *InjectObjInfoProxy) {
+func (myself *injector) callAftersetfun(proxyBean *BeanProxy) {
 	funAfter := proxyBean.aftersetMethod
 
 	if funAfter.Kind() != reflect.Invalid {
@@ -143,7 +150,7 @@ func (myself *injector) callAftersetfun(proxyBean *InjectObjInfoProxy) {
 /**
  * define proxy message
  */
-func (i *injector) scanProxyInject(proxies map[string]*InjectObjInfoProxy) error {
+func (i *injector) scanProxyInject(proxies map[string]*BeanProxy) error {
 
 	for proxyName, proxyRef := range proxies {
 

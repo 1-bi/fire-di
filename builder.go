@@ -34,8 +34,8 @@ func newBuilder(binder *BeanCtxBinder, bindingKeys []bindingKey) InterfaceBuilde
 /**
  * bind base proxy
  */
-func (myself *baseBuilder) getProxy(ref interface{}) *InjectObjInfoProxy {
-	proxyObj := new(InjectObjInfoProxy)
+func (myself *baseBuilder) getProxy(ref interface{}) *BeanProxy {
+	proxyObj := new(BeanProxy)
 	proxyObj.ref = ref
 	objType := reflect.TypeOf(ref)
 

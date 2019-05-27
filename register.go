@@ -3,10 +3,9 @@ package fire_di
 import (
 	"errors"
 	"fmt"
-	"github.com/1-bi/fire-di/test/mockobject"
-	"gitlab.com/1-bi/log-api/loggercom"
-	"log"
+	"github.com/1-bi/log-api"
 	"reflect"
+	"strings"
 )
 
 // RegisterBean define register bean
@@ -28,7 +27,7 @@ func newRegister() *register {
 	register.invokedFuns = make([]interface{}, 0)
 	register.loginst = nil
 
-	register.proxyBeans = make([]*InjectObjInfoProxy, 0)
+	register.proxyBeans = make([]*BeanProxy, 0)
 
 	return register
 }
@@ -38,13 +37,13 @@ func newRegister() *register {
  */
 type register struct {
 	bindingErrors []error
-	loginst       loggercom.Logger
+	loginst       logapi.Logger
 	bindingFuns   map[string]interface{}
 	bindingType   map[reflect.Type]reflect.Type
 	invokedFuns   []interface{}
 	beanFuns      map[string]interface{}
 	// define proxy bean dependency
-	proxyBeans []*InjectObjInfoProxy
+	proxyBeans []*BeanProxy
 }
 
 func (myself *register) convertToResultObject(registerBean *RegisterBean) (reflect.Value, error) {
@@ -68,7 +67,15 @@ func (myself *register) convertToResultObject(registerBean *RegisterBean) (refle
 	} else if returnOutTyp.Kind() == reflect.Ptr {
 		outputObj = beanVal
 	} else if returnOutTyp.Kind() == reflect.Struct {
-		outputObj = beanVal.Elem()
+
+		instTyp := beanVal.Type().String()
+		retoutTyp := returnOutTyp.String()
+
+		if strings.HasSuffix(instTyp, retoutTyp) {
+			outputObj = beanVal.Elem()
+		} else {
+			return outputObj, errors.New("Implement \"" + beanVal.Type().String() + "\" is not match struct \"" + returnOutTyp.String() + "\"")
+		}
 	}
 
 	return outputObj, nil
@@ -80,13 +87,14 @@ func (myself *register) convertToResultObject(registerBean *RegisterBean) (refle
  */
 func (myself *register) RegBean(registerBean *RegisterBean) {
 
-	// --- create new function ---
+	// build inject object bean method
 	proxyBean := myself.getProxy(registerBean.Bean)
 
 	outputObj, err := myself.convertToResultObject(registerBean)
 
 	if err != nil {
-		log.Println(err)
+		myself.loginst.Info(err.Error(), nil)
+
 	}
 
 	proxyHandlerRef := FuncInterceptor(registerBean.ProvideFun, func(in []reflect.Value) []reflect.Value {
@@ -118,14 +126,17 @@ func (myself *register) RegFunc(fn interface{}) {
 
 		// --- defined depenMethods status ---
 		result := fnPrt.Call(in)
+
 		return result
 	})
 
 	// define object ---
-	var params = make([]reflect.Value, fnPrt.Type().NumIn())
+	/*
+		var params = make([]reflect.Value, fnPrt.Type().NumIn())
 
-	mockObj := new(mockobject.Case4MockObj2)
-	params[0] = reflect.ValueOf(mockObj)
+		mockObj := new(mockobject.Case4MockObj2)
+		params[0] = reflect.ValueOf(mockObj)
+	*/
 
 	fName := funcName(fn)
 	myself.bindingFuns[fName] = resultFun.Interface()
@@ -133,12 +144,12 @@ func (myself *register) RegFunc(fn interface{}) {
 }
 
 // GetProxyBeans get the proxy beans reference
-func (myself *register) GetProxyBeans() []*InjectObjInfoProxy {
+func (myself *register) GetProxyBeans() []*BeanProxy {
 	return myself.proxyBeans
 }
 
-func (myself *register) getProxy(ref interface{}) *InjectObjInfoProxy {
-	proxyObj := new(InjectObjInfoProxy)
+func (myself *register) getProxy(ref interface{}) *BeanProxy {
+	proxyObj := new(BeanProxy)
 	proxyObj.dependentStructs = make([]string, 0)
 	proxyObj.applyProxy(ref)
 	return proxyObj

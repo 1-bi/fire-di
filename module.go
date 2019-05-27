@@ -1,7 +1,7 @@
 package fire_di
 
 import (
-	"gitlab.com/1-bi/log-api/loggerzap"
+	"github.com/1-bi/log-api"
 )
 
 // BaseModuleContext define beanCtx object
@@ -23,7 +23,7 @@ func registerModules(mods []Module) BaseModuleContext {
 	provider := newRegister()
 
 	// --- bind common logger ----
-	log := loggerzap.GetLogger()
+	log := logapi.GetLogger("fire-di")
 
 	if log != nil {
 
