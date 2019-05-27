@@ -27,7 +27,7 @@ func newRegister() *register {
 	register.invokedFuns = make([]interface{}, 0)
 	register.loginst = nil
 
-	register.proxyBeans = make([]*InjectObjInfoProxy, 0)
+	register.proxyBeans = make([]*InjectedBeanInfoProxy, 0)
 
 	return register
 }
@@ -43,7 +43,7 @@ type register struct {
 	invokedFuns   []interface{}
 	beanFuns      map[string]interface{}
 	// define proxy bean dependency
-	proxyBeans []*InjectObjInfoProxy
+	proxyBeans []*InjectedBeanInfoProxy
 }
 
 func (myself *register) convertToResultObject(registerBean *RegisterBean) (reflect.Value, error) {
@@ -87,7 +87,7 @@ func (myself *register) convertToResultObject(registerBean *RegisterBean) (refle
  */
 func (myself *register) RegBean(registerBean *RegisterBean) {
 
-	// --- create new function ---
+	// build inject object bean method
 	proxyBean := myself.getProxy(registerBean.Bean)
 
 	outputObj, err := myself.convertToResultObject(registerBean)
@@ -144,12 +144,12 @@ func (myself *register) RegFunc(fn interface{}) {
 }
 
 // GetProxyBeans get the proxy beans reference
-func (myself *register) GetProxyBeans() []*InjectObjInfoProxy {
+func (myself *register) GetProxyBeans() []*InjectedBeanInfoProxy {
 	return myself.proxyBeans
 }
 
-func (myself *register) getProxy(ref interface{}) *InjectObjInfoProxy {
-	proxyObj := new(InjectObjInfoProxy)
+func (myself *register) getProxy(ref interface{}) *InjectedBeanInfoProxy {
+	proxyObj := new(InjectedBeanInfoProxy)
 	proxyObj.dependentStructs = make([]string, 0)
 	proxyObj.applyProxy(ref)
 	return proxyObj

@@ -60,7 +60,7 @@ func createInjector(bs providerstore) (*injector, error) {
 	return injector, err
 }
 
-func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoProxy) {
+func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectedBeanInfoProxy) {
 
 	for _, proxyBean := range proxyBeans {
 
@@ -84,7 +84,7 @@ func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*InjectObjInfoPr
 
 }
 
-func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, depenMethods []*dependencyState) {
+func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectedBeanInfoProxy, depenMethods []*dependencyState) {
 
 	for _, methodRef := range proxyBean.injectMethods {
 
@@ -133,7 +133,7 @@ func (myself *injector) setProxyBeanInjectFun(proxyBean *InjectObjInfoProxy, dep
 
 }
 
-func (myself *injector) callAftersetfun(proxyBean *InjectObjInfoProxy) {
+func (myself *injector) callAftersetfun(proxyBean *InjectedBeanInfoProxy) {
 	funAfter := proxyBean.aftersetMethod
 
 	if funAfter.Kind() != reflect.Invalid {
@@ -144,7 +144,7 @@ func (myself *injector) callAftersetfun(proxyBean *InjectObjInfoProxy) {
 /**
  * define proxy message
  */
-func (i *injector) scanProxyInject(proxies map[string]*InjectObjInfoProxy) error {
+func (i *injector) scanProxyInject(proxies map[string]*InjectedBeanInfoProxy) error {
 
 	for proxyName, proxyRef := range proxies {
 

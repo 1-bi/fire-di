@@ -28,7 +28,8 @@ func (myself *InterfaceModule) Bind(ctx di.ModuleContext) {
  */
 func (myself *InterfaceModule) provideInterface_Case1() *di.RegisterBean {
 
-	var pro func() mockobject.SayHelloI
+	//var pro func() mockobject.SayHelloI
+	var pro func() *mockobject.SayHelloCase1
 	rb := new(di.RegisterBean)
 	rb.Bean = new(mockobject.SayHelloCase1)
 	rb.ProvideFun = &pro

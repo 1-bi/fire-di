@@ -1,7 +1,6 @@
 package fire_di
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 )
@@ -9,7 +8,7 @@ import (
 /**
  * defin all project object interface
  */
-type InjectObjInfoProxy struct {
+type InjectedBeanInfoProxy struct {
 	ref     interface{}
 	methods map[string]reflect.Method
 
@@ -20,7 +19,7 @@ type InjectObjInfoProxy struct {
 }
 
 // apply proxy to self
-func (myself *InjectObjInfoProxy) applyProxy(src interface{}) {
+func (myself *InjectedBeanInfoProxy) applyProxy(src interface{}) {
 
 	objType := reflect.TypeOf(src)
 	objRev := reflect.ValueOf(src)
@@ -65,7 +64,7 @@ func (myself *InjectObjInfoProxy) applyProxy(src interface{}) {
 
 }
 
-func (myself *InjectObjInfoProxy) foundDependencyCls(injectMethod reflect.Method, ownerObjTyp reflect.Type) {
+func (myself *InjectedBeanInfoProxy) foundDependencyCls(injectMethod reflect.Method, ownerObjTyp reflect.Type) {
 
 	methodTyp := injectMethod.Type
 	var i int
@@ -98,7 +97,7 @@ func (myself *InjectObjInfoProxy) foundDependencyCls(injectMethod reflect.Method
 
 }
 
-func (myself *InjectObjInfoProxy) GetAllDependency() []string {
+func (myself *InjectedBeanInfoProxy) GetAllDependency() []string {
 	return myself.dependentStructs
 }
 
@@ -114,7 +113,6 @@ func (myself *proxyInjectObject) getProxyInvokeFun() interface{} {
 
 	v := reflect.MakeFunc(targetFun.Type(), func(args []reflect.Value) (results []reflect.Value) {
 
-		fmt.Println("-hellomoo")
 		if len(args) == 0 {
 			return nil
 		}
