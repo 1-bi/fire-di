@@ -8,7 +8,7 @@ import (
 /**
  * defin all project object interface
  */
-type InjectedBeanInfoProxy struct {
+type BeanProxy struct {
 	ref     interface{}
 	methods map[string]reflect.Method
 
@@ -19,7 +19,7 @@ type InjectedBeanInfoProxy struct {
 }
 
 // apply proxy to self
-func (myself *InjectedBeanInfoProxy) applyProxy(src interface{}) {
+func (myself *BeanProxy) applyProxy(src interface{}) {
 
 	objType := reflect.TypeOf(src)
 	objRev := reflect.ValueOf(src)
@@ -64,7 +64,7 @@ func (myself *InjectedBeanInfoProxy) applyProxy(src interface{}) {
 
 }
 
-func (myself *InjectedBeanInfoProxy) foundDependencyCls(injectMethod reflect.Method, ownerObjTyp reflect.Type) {
+func (myself *BeanProxy) foundDependencyCls(injectMethod reflect.Method, ownerObjTyp reflect.Type) {
 
 	methodTyp := injectMethod.Type
 	var i int
@@ -97,8 +97,12 @@ func (myself *InjectedBeanInfoProxy) foundDependencyCls(injectMethod reflect.Met
 
 }
 
-func (myself *InjectedBeanInfoProxy) GetAllDependency() []string {
+func (myself *BeanProxy) GetAllDependency() []string {
 	return myself.dependentStructs
+}
+
+func (myself *BeanProxy) CreateInjectingState() *InjectingState {
+	return NewInjectingState(myself.ref, myself.injectMethods, myself.aftersetMethod)
 }
 
 type proxyInjectObject struct {

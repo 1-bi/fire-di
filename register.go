@@ -27,7 +27,7 @@ func newRegister() *register {
 	register.invokedFuns = make([]interface{}, 0)
 	register.loginst = nil
 
-	register.proxyBeans = make([]*InjectedBeanInfoProxy, 0)
+	register.proxyBeans = make([]*BeanProxy, 0)
 
 	return register
 }
@@ -43,7 +43,7 @@ type register struct {
 	invokedFuns   []interface{}
 	beanFuns      map[string]interface{}
 	// define proxy bean dependency
-	proxyBeans []*InjectedBeanInfoProxy
+	proxyBeans []*BeanProxy
 }
 
 func (myself *register) convertToResultObject(registerBean *RegisterBean) (reflect.Value, error) {
@@ -144,12 +144,12 @@ func (myself *register) RegFunc(fn interface{}) {
 }
 
 // GetProxyBeans get the proxy beans reference
-func (myself *register) GetProxyBeans() []*InjectedBeanInfoProxy {
+func (myself *register) GetProxyBeans() []*BeanProxy {
 	return myself.proxyBeans
 }
 
-func (myself *register) getProxy(ref interface{}) *InjectedBeanInfoProxy {
-	proxyObj := new(InjectedBeanInfoProxy)
+func (myself *register) getProxy(ref interface{}) *BeanProxy {
+	proxyObj := new(BeanProxy)
 	proxyObj.dependentStructs = make([]string, 0)
 	proxyObj.applyProxy(ref)
 	return proxyObj

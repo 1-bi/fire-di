@@ -11,7 +11,7 @@ type BeanCtxBinder struct {
 	bindings      map[bindingKey]binding
 
 	aliasNameMapping map[string]reflect.Type
-	bindBeans        map[reflect.Type]*InjectedBeanInfoProxy
+	bindBeans        map[reflect.Type]*BeanProxy
 }
 
 // Bind ... bind all interface
@@ -27,7 +27,7 @@ func (myself *BeanCtxBinder) alias(aliasType string, dstType reflect.Type) {
 	myself.aliasNameMapping[aliasType] = dstType
 }
 
-func (myself *BeanCtxBinder) bindProxyInst(proxyBean *InjectedBeanInfoProxy, refType reflect.Type) {
+func (myself *BeanCtxBinder) bindProxyInst(proxyBean *BeanProxy, refType reflect.Type) {
 	myself.bindBeans[refType] = proxyBean
 }
 
@@ -87,7 +87,7 @@ func (myself *BeanCtxBinder) String() string {
  */
 func createBeanCtxBinder() *BeanCtxBinder {
 	return &BeanCtxBinder{make([]error, 0), make(map[bindingKey]binding),
-		make(map[string]reflect.Type, 0), make(map[reflect.Type]*InjectedBeanInfoProxy, 0)}
+		make(map[string]reflect.Type, 0), make(map[reflect.Type]*BeanProxy, 0)}
 }
 
 /**
