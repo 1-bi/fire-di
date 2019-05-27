@@ -6,31 +6,31 @@ import (
 	"log"
 )
 
-type Case1Module struct {
+type InterfaceModule struct {
 }
 
-func (myself *Case1Module) Bind(ctx di.ModuleContext) {
+func (myself *InterfaceModule) Bind(ctx di.ModuleContext) {
 
 	/**
 	 * 注册提供使用的 struct bean
 	 */
-	ctx.GetRegister().RegBean(myself.provideCase1Obj1())
+	ctx.GetRegister().RegBean(myself.provideInterface_Case1())
 
 	/**
 	 * 定义提供使用的 struct bean
 	 */
-	ctx.GetRegister().Invoke(myself.injectCase1)
+	//ctx.GetRegister().Invoke(myself.injectCase1)
 
 }
 
 /**
  * 定义注册的bean
  */
-func (myself *Case1Module) provideCase1Obj1() *di.RegisterBean {
+func (myself *InterfaceModule) provideInterface_Case1() *di.RegisterBean {
 
-	var pro func() *mockobject.Case1MockObj1
+	var pro func() mockobject.SayHelloI
 	rb := new(di.RegisterBean)
-	rb.Bean = &mockobject.Case1MockObj1{}
+	rb.Bean = new(mockobject.SayHelloCase1)
 	rb.ProvideFun = &pro
 
 	return rb
@@ -39,7 +39,7 @@ func (myself *Case1Module) provideCase1Obj1() *di.RegisterBean {
 /**
  * 调用函数
  */
-func (myself *Case1Module) injectCase1(obj1 *mockobject.Case1MockObj1) {
+func (myself *InterfaceModule) injectCase1(obj1 *mockobject.Case1MockObj1) {
 	log.SetPrefix("InterfaceModule.injectCase1: ")
 
 	log.Print(" Start to invoke function  -> ")

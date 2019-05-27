@@ -3,8 +3,7 @@ package fire_di
 import (
 	"errors"
 	"fmt"
-	"gitlab.com/1-bi/log-api/loggercom"
-	"log"
+	"github.com/1-bi/log-api"
 	"reflect"
 	"strings"
 )
@@ -38,7 +37,7 @@ func newRegister() *register {
  */
 type register struct {
 	bindingErrors []error
-	loginst       loggercom.Logger
+	loginst       logapi.Logger
 	bindingFuns   map[string]interface{}
 	bindingType   map[reflect.Type]reflect.Type
 	invokedFuns   []interface{}
@@ -94,7 +93,8 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 	outputObj, err := myself.convertToResultObject(registerBean)
 
 	if err != nil {
-		log.Println(err)
+		myself.loginst.Info(err.Error(), nil)
+
 	}
 
 	proxyHandlerRef := FuncInterceptor(registerBean.ProvideFun, func(in []reflect.Value) []reflect.Value {
