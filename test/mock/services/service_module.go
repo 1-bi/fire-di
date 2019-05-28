@@ -28,10 +28,10 @@ func (myself *ServiceModule) Bind(ctx di.ModuleContext) {
 func (myself *ServiceModule) provideService() *di.RegisterBean {
 
 	//var pro func() mockobject.SayHelloI
-	var pro func() *TestService
+	//var pro func() *TestService
 	rb := new(di.RegisterBean)
 	rb.Bean = NewTestService()
-	rb.ProvideFun = &pro
+	rb.ProvideFun = new(func() *TestService)
 	return rb
 }
 
