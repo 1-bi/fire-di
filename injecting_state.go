@@ -1,9 +1,9 @@
 package fire_di
 
 import (
-	"fmt"
 	"github.com/1-bi/log-api"
 	"go.uber.org/dig"
+	"log"
 	"reflect"
 )
 
@@ -47,12 +47,14 @@ func (myself *InjectingState) DoWork() error {
 
 	if myself.logger.IsDebugEnabled() {
 		// --- get bean name -
-		fmt.Println(reflect.ValueOf(myself.bean).String())
+		sb := logapi.NewStructBean()
+		sb.LogString("bean name ", reflect.ValueOf(myself.bean).String())
+		myself.logger.Debug("Inject bean .", sb)
 	}
 
 	var err error
 
-	for _, methodRef := range myself.injectMethods {
+	for m, methodRef := range myself.injectMethods {
 		refTarFun := reflect.New(methodRef.Type())
 		fn := refTarFun.Interface()
 
@@ -61,7 +63,25 @@ func (myself *InjectingState) DoWork() error {
 			// call object
 			result := methodRef.Call(in)
 
-			// --- define error object
+			// --- remove state
+			// --- logic for after inject method
+			delete(myself.injectCandidate, m)
+			if len(myself.injectCandidate) == 0 {
+				// --- fire the after method ---
+
+				if myself.aftersetMethod.IsValid() && !myself.aftersetMethod.IsNil() {
+					refValues := myself.callAftersetfun(myself.aftersetMethod)
+
+					// run after set
+					if myself.logger.IsDebugEnabled() {
+						myself.logger.Debug("Show value after executing afterset function.", nil)
+						for _, refVal := range refValues {
+							log.Print(refVal)
+						}
+					}
+
+				}
+			}
 
 			return result
 		})
@@ -74,4 +94,11 @@ func (myself *InjectingState) DoWork() error {
 	}
 	return err
 
+}
+
+func (myself *InjectingState) callAftersetfun(funAfter reflect.Value) []reflect.Value {
+	if funAfter.Kind() != reflect.Invalid {
+		return funAfter.Call(nil)
+	}
+	return nil
 }

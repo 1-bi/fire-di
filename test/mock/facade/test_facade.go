@@ -1,6 +1,7 @@
 package facade
 
 import (
+	"fmt"
 	"github.com/1-bi/fire-di/test/mock/services"
 	"github.com/1-bi/log-api"
 	"log"
@@ -41,4 +42,7 @@ func (myself *TestFacade) TestFacadeMethod() {
 	log.Println("Test facade method define ")
 	myself.testService.TestMethod1()
 
+}
+func (myself *TestFacade) Afterset() {
+	fmt.Println("call after set ")
 }
