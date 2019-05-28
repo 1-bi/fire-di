@@ -27,7 +27,9 @@ func createInjector(bs providerstore) (*injector, error) {
 	// ---- scan all object first ----
 
 	//  ----- scan and add method to container ---
-	for _, handler := range bs.modContext.GetRegister().bindingFuns {
+	for fnName, handler := range bs.modContext.GetRegister().bindingFuns {
+		fmt.Println(fnName)
+
 		err = injector.container.Provide(handler)
 		if err != nil {
 			break
@@ -51,7 +53,7 @@ func createInjector(bs providerstore) (*injector, error) {
 
 	// ---- get all injector object dependency mapping ---
 
-	injector.proxyBeanInvokedFunDefined(bs.modContext.GetRegister().GetProxyBeans())
+	err = injector.proxyBeanInvokedFunDefined(bs.modContext.GetRegister().GetProxyBeans())
 
 	if err != nil {
 		return injector, err
@@ -60,34 +62,42 @@ func createInjector(bs providerstore) (*injector, error) {
 	return injector, err
 }
 
-func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*BeanProxy) {
+func (myself *injector) proxyBeanInvokedFunDefined(proxyBeans []*BeanProxy) error {
+
+	var err error
 
 	for _, proxyBean := range proxyBeans {
 
+		// provide proxy bean by function define
 		beanInjectState := proxyBean.CreateInjectingState()
 		// inject container
 		beanInjectState.SetDigContainer(myself.container)
 
-		beanInjectState.DoWork()
+		err = beanInjectState.DoWork()
 
-		dependencyStateArray := make([]*dependencyState, 0)
-
-		for _, dependency := range proxyBean.dependentStructs {
-
-			dependencyStateArray = append(dependencyStateArray, newDependencyState(dependency))
+		if err != nil {
+			break
 		}
 
-		if len(dependencyStateArray) > 0 {
+		/*
+			dependencyStateArray := make([]*dependencyState, 0)
 
-			myself.setProxyBeanInjectFun(proxyBean, dependencyStateArray)
+			for _, dependency := range proxyBean.dependentStructs {
 
-		} else {
-			//  call after method directory
-			myself.callAftersetfun(proxyBean)
-		}
+				dependencyStateArray = append(dependencyStateArray, newDependencyState(dependency))
+			}
+
+			if len(dependencyStateArray) > 0 {
+
+				myself.setProxyBeanInjectFun(proxyBean, dependencyStateArray)
+
+			} else {
+				//  call after method directory
+				myself.callAftersetfun(proxyBean)
+			}*/
 
 	}
-
+	return err
 }
 
 func (myself *injector) setProxyBeanInjectFun(proxyBean *BeanProxy, depenMethods []*dependencyState) {
@@ -182,8 +192,6 @@ func (i *injector) Execute(funcs ...interface{}) error {
 	for _, fn := range funcs {
 
 		// ---- create proxy function ---
-
-		//proxyFn := getFunProxy( fn )
 
 		fname := funcName(fn)
 

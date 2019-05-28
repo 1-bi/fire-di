@@ -113,6 +113,22 @@ func (myself *register) RegBean(registerBean *RegisterBean) error {
 	// build inject object bean method
 	proxyBean := myself.getProxy(registerBean.Bean)
 
+	err := myself.setBindingFunctionsFromBean(registerBean)
+	if err != nil {
+		return err
+	}
+
+	// --- append the proxy bean and register  ---
+	myself.proxyBeans = append(myself.proxyBeans, proxyBean)
+	myself.proxyBeanIdMap[beanId] = beanName
+
+	return nil
+
+}
+
+// setBindingFunctionsFromBean pick up function provided bean to map of binding function
+func (myself *register) setBindingFunctionsFromBean(registerBean *RegisterBean) error {
+
 	outputObj, err := myself.convertToResultObject(registerBean)
 
 	if err != nil {
@@ -128,10 +144,6 @@ func (myself *register) RegBean(registerBean *RegisterBean) error {
 
 	fn := funcNameProvide(registerBean)
 	myself.bindingFuns[fn] = proxyHandler
-
-	// --- append the proxy bean and register  ---
-	myself.proxyBeans = append(myself.proxyBeans, proxyBean)
-	myself.proxyBeanIdMap[beanId] = beanName
 
 	return nil
 

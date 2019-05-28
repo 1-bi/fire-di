@@ -39,8 +39,8 @@ func (myself *ServiceModule) provideSayHello() *di.RegisterBean {
 	var case1 *mockobject.SayHelloCase1
 
 	var pro = func() mockobject.SayHelloI {
-		obj := new(mockobject.SayHelloCase1)
-		return obj
+		case1 = new(mockobject.SayHelloCase1)
+		return case1
 	}
 
 	rb := new(di.RegisterBean)

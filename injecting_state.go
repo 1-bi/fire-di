@@ -43,12 +43,35 @@ func (myself *InjectingState) SetDigContainer(digContainer *dig.Container) {
 	myself.digContainer = digContainer
 }
 
-func (myself *InjectingState) DoWork() {
+func (myself *InjectingState) DoWork() error {
 
 	if myself.logger.IsDebugEnabled() {
 		// --- get bean name -
 		fmt.Println(reflect.ValueOf(myself.bean).String())
-
 	}
+
+	var err error
+
+	for _, methodRef := range myself.injectMethods {
+		refTarFun := reflect.New(methodRef.Type())
+		fn := refTarFun.Interface()
+
+		// ---- set the value ---
+		resultFun := FuncInterceptor(fn, func(in []reflect.Value) []reflect.Value {
+			// call object
+			result := methodRef.Call(in)
+
+			// --- define error object
+
+			return result
+		})
+
+		// define function interface and mapping
+		err = myself.digContainer.Invoke(resultFun.Interface())
+		if err != nil {
+			break
+		}
+	}
+	return err
 
 }
