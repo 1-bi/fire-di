@@ -2,6 +2,7 @@ package fire_di
 
 import (
 	"fmt"
+	"hash/fnv"
 	"reflect"
 	"runtime"
 	"strings"
@@ -40,6 +41,33 @@ func funcNameProvide(regBean *RegisterBean) string {
 
 	funcName = strings.Join([]string{beanStr, funStr}, ":")
 	return funcName
+}
+
+// GetBeanNameAndKind get bean interface
+func GetBeanNameAndKind(bean interface{}) (string, reflect.Kind) {
+	var beanStr string
+	beanType := reflect.TypeOf(bean)
+
+	typestr := ""
+	if beanType.Kind() == reflect.Ptr {
+		typestr = reflect.Ptr.String()
+	} else if beanType.Kind() == reflect.Struct {
+		typestr = reflect.Struct.String()
+	} else if beanType.Kind() == reflect.Interface {
+		typestr = reflect.Interface.String()
+	} else {
+		typestr = "un"
+	}
+
+	beanStr = beanType.String()
+
+	return strings.Join([]string{typestr, beanStr}, ":"), beanType.Kind()
+}
+
+func Hash(input string) uint64 {
+	h := fnv.New64()
+	h.Write([]byte(input))
+	return h.Sum64()
 }
 
 // FuncInterceptor define interceptor function handle

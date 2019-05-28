@@ -25,9 +25,11 @@ func newRegister() *register {
 	register.bindingFuns = make(map[string]interface{})
 	register.bindingType = make(map[reflect.Type]reflect.Type)
 	register.invokedFuns = make([]interface{}, 0)
-	register.loginst = nil
+	register.loginst = logapi.GetLogger("fire-di")
 
 	register.proxyBeans = make([]*BeanProxy, 0)
+
+	register.proxyBeanIdMap = make(map[uint64]string, 0)
 
 	return register
 }
@@ -42,8 +44,10 @@ type register struct {
 	bindingType   map[reflect.Type]reflect.Type
 	invokedFuns   []interface{}
 	beanFuns      map[string]interface{}
+
 	// define proxy bean dependency
-	proxyBeans []*BeanProxy
+	proxyBeans     []*BeanProxy
+	proxyBeanIdMap map[uint64]string
 }
 
 func (myself *register) convertToResultObject(registerBean *RegisterBean) (reflect.Value, error) {
@@ -85,7 +89,26 @@ func (myself *register) convertToResultObject(registerBean *RegisterBean) (refle
 /**
  * register bean with the way "RegisterBean"
  */
-func (myself *register) RegBean(registerBean *RegisterBean) {
+func (myself *register) RegBean(registerBean *RegisterBean) error {
+
+	// --- check input type  ---
+	beanName, kind := GetBeanNameAndKind(registerBean.Bean)
+	// check bean kind is porinter or not
+	if reflect.Ptr != kind {
+		err := errors.New("Registered Bean \"" + beanName + "\" type is not pointer type. Please check type inputed.")
+		myself.loginst.Warn(err.Error(), nil)
+		return err
+	}
+
+	// --- check unqiue bean name ---
+	beanId := Hash(beanName)
+	if myself.proxyBeanIdMap[beanId] != "" {
+		err := errors.New("Registered Bean \"" + beanName + "\" type is dupicated. Please check type inputed.")
+		myself.loginst.Warn(err.Error(), nil)
+		return err
+	}
+
+	// go ahead after check
 
 	// build inject object bean method
 	proxyBean := myself.getProxy(registerBean.Bean)
@@ -94,11 +117,10 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 
 	if err != nil {
 		myself.loginst.Info(err.Error(), nil)
-
+		return err
 	}
 
 	proxyHandlerRef := FuncInterceptor(registerBean.ProvideFun, func(in []reflect.Value) []reflect.Value {
-
 		return []reflect.Value{outputObj}
 	})
 
@@ -107,10 +129,11 @@ func (myself *register) RegBean(registerBean *RegisterBean) {
 	fn := funcNameProvide(registerBean)
 	myself.bindingFuns[fn] = proxyHandler
 
-	// --- append the proxy bean ---
+	// --- append the proxy bean and register  ---
 	myself.proxyBeans = append(myself.proxyBeans, proxyBean)
+	myself.proxyBeanIdMap[beanId] = beanName
 
-	// --- check function with prefix "Inject" ---
+	return nil
 
 }
 

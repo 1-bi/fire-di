@@ -1,9 +1,11 @@
 package test
 
 import (
+	"fmt"
 	di "github.com/1-bi/fire-di"
 	"github.com/1-bi/fire-di/test/mock/facade"
 	"github.com/1-bi/fire-di/test/mock/services"
+	"hash/fnv"
 	"log"
 	"testing"
 )
@@ -40,4 +42,18 @@ func TestDI_module_Inject(t *testing.T) {
 
 func injectRun(testFacade *facade.TestFacade) {
 	testFacade.TestFacadeMethod()
+}
+
+func Test_string(t *testing.T) {
+	s := "sha1 tringfyy"
+
+	h := fnv.New64()
+
+	h.Write([]byte(s))
+
+	bs := h.Sum(nil)
+
+	fmt.Println(s)
+	fmt.Printf("%x\n", bs)
+	fmt.Println(h.Sum64())
 }
