@@ -3,6 +3,7 @@ package facade
 import (
 	"fmt"
 	"github.com/1-bi/fire-di/test/mock/services"
+	"github.com/1-bi/fire-di/test/mockobject"
 	"github.com/1-bi/log-api"
 	"log"
 )
@@ -32,10 +33,13 @@ func (myself *TestFacade) InjectService(
 	myself.testService = testService
 
 	myself.logger = logapi.GetLogger("fire-di.facade")
+}
 
-	//myself.servbusEvent = servbusEvent
-	//myself.logger = logger
+func (myself *TestFacade) InjectSayGoodbye(
+	goodbye mockobject.GoodbyeI) {
+	//myself.clientApi = clientApi
 
+	fmt.Println("call say good bye")
 }
 
 func (myself *TestFacade) TestFacadeMethod() {
