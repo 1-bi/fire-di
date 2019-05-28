@@ -27,8 +27,7 @@ func createInjector(bs providerstore) (*injector, error) {
 	// ---- scan all object first ----
 
 	//  ----- scan and add method to container ---
-	for fnName, handler := range bs.modContext.GetRegister().bindingFuns {
-		fmt.Println(fnName)
+	for _, handler := range bs.modContext.GetRegister().bindingFuns {
 
 		err = injector.container.Provide(handler)
 		if err != nil {
