@@ -14,8 +14,7 @@ type BeanProxy struct {
 
 	injectMethods map[reflect.Method]reflect.Value
 	// after set method define
-	aftersetMethod   reflect.Value
-	dependentStructs []string
+	aftersetMethod reflect.Value
 }
 
 // apply proxy to self
@@ -45,7 +44,7 @@ func (myself *BeanProxy) applyProxy(src interface{}) {
 
 		if matchPrefix {
 			// ---- invoke method bean ---
-			myself.foundDependencyCls(m, objType)
+
 			injectMap[m] = objRev.Method(i)
 
 		}
@@ -62,43 +61,6 @@ func (myself *BeanProxy) applyProxy(src interface{}) {
 	// --- define bean ---
 	myself.ref = src
 
-}
-
-func (myself *BeanProxy) foundDependencyCls(injectMethod reflect.Method, ownerObjTyp reflect.Type) {
-
-	methodTyp := injectMethod.Type
-	var i int
-	var existedDependency bool
-	for i = 0; i < methodTyp.NumIn(); i++ {
-		objectTyp := methodTyp.In(i)
-		if objectTyp.Kind() == reflect.Ptr {
-
-			// --- skip add dependency when the type inputed equals type object ---
-			if objectTyp == ownerObjTyp {
-				continue
-			}
-
-			// --- check the dependency ---
-			existedDependency = false
-			for _, v := range myself.dependentStructs {
-
-				if v == objectTyp.String() {
-					existedDependency = true
-				}
-
-			}
-
-			if !existedDependency {
-				myself.dependentStructs = append(myself.dependentStructs, objectTyp.String())
-			}
-
-		}
-	}
-
-}
-
-func (myself *BeanProxy) GetAllDependency() []string {
-	return myself.dependentStructs
 }
 
 func (myself *BeanProxy) CreateInjectingState() *InjectingState {
