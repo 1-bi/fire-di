@@ -47,9 +47,9 @@ func (myself *InjectingState) DoWork() error {
 
 	if myself.logger.IsDebugEnabled() {
 		// --- get bean name -
-		//sb := logapi.NewStructBean()
-		//sb.LogString("bean name ", reflect.ValueOf(myself.bean).String())
-		//myself.logger.Debug("Inject bean .", sb)
+		sb := logapi.NewStructBean()
+		sb.LogString("bean name ", reflect.ValueOf(myself.bean).String())
+		myself.logger.Debug("Inject bean .", sb)
 	}
 
 	var err error

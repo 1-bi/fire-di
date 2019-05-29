@@ -185,7 +185,6 @@ func (myself *register) GetProxyBeans() []*BeanProxy {
 
 func (myself *register) getProxy(ref interface{}) *BeanProxy {
 	proxyObj := new(BeanProxy)
-	proxyObj.dependentStructs = make([]string, 0)
 	proxyObj.applyProxy(ref)
 	return proxyObj
 }
